@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS 변수를 사용한 테마 설정 */
+@layer base {
+  /* 라이트 모드 테마 색상 */
+  :root {
+    --background: 0 0% 100%;          /* 배경색 */
+    --foreground: 222.2 84% 4.9%;     /* 텍스트 색 */
+
+    --card: 0 0% 100%;                /* 카드 배경색 */
+    --card-foreground: 222.2 84% 4.9%; /* 카드 텍스트 색 */
+
+    --popover: 0 0% 100%;             /* 팝오버 배경색 */
+    --popover-foreground: 222.2 84% 4.9%; /* 팝오버 텍스트 색 */
+
+    --primary: 262 83% 58%;           /* 기본 색상 (보라색) */
+    --primary-foreground: 210 40% 98%; /* 기본 색상 위의 텍스트 색 */
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.5rem;                 /* 기본 모서리 둥글기 */
+  }
+
+  /* 다크 모드 테마 색상 */
+  .dark {
+    --background: 222.2 84% 4.9%;     /* 어두운 배경색 */
+    --foreground: 210 40% 98%;        /* 밝은 텍스트 색 */
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 262 83% 58%;
+  }
+}
+
+/* 기본 스타일 설정 */
+@layer base {
+  * {
+    @apply border-border;  /* 모든 요소에 기본 border 색상 적용 */
+  }
+  body {
+    @apply bg-background text-foreground;  /* body에 기본 배경색과 텍스트 색 적용 */
+  }
+}
+
+/* 커스텀 스크롤바 스타일 */
+@layer utilities {
+  /* Chrome, Safari, Edge 용 스크롤바 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;  /* 스크롤바 트랙 배경색 */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;  /* 스크롤바 썸 스타일 */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;  /* 호버 시 스크롤바 썸 색상 */
+  }
+
+  /* Firefox 용 스크롤바 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.muted-foreground/30') theme('colors.muted');
+  }
+}
+
+/* 글래스 모피즘 효과 - 반투명 흐림 효과 */
+.glass {
+  @apply backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-white/10;
+}
+
+/* 그라디언트 텍스트 - 보라색에서 분홍색으로 */
+.gradient-text {
+  @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+}
+
+/* 보라색 그라디언트 배경 */
+.gradient-purple {
+  @apply bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800;
+}
+
+/* 카드 호버 효과 - 그림자와 살짝 올라오는 애니메이션 */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* 가벼운 페이드 애니메이션 */
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-light {
+  animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
