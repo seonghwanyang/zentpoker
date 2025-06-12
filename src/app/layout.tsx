@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
+import { Providers } from '@/providers'
 
 // Google Fonts에서 Inter 폰트 불러오기
 const inter = Inter({ subsets: ['latin'] })
@@ -30,7 +31,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={inter.className}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         {/* 토스트 메시지를 위한 컴포넌트 */}
         <Toaster />
       </body>

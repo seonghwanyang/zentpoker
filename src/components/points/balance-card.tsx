@@ -1,27 +1,38 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowUpRight, Wallet } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { 
+  ArrowUpRight, 
+  Wallet, 
+  Send, 
+  CreditCard,
+  TrendingUp,
+  Bell
+} from 'lucide-react'
 import Link from 'next/link'
 
-// 포인트 잔액 카드 컴포넌트의 Props 타입 정의
 interface BalanceCardProps {
-  balance: number  // 현재 포인트 잔액
-  memberGrade: 'GUEST' | 'REGULAR' | 'ADMIN'  // 회원 등급
-  userName?: string  // 사용자 이름 (선택적)
+  balance: number
+  memberGrade: 'GUEST' | 'REGULAR' | 'ADMIN'
+  userName?: string
+  userImage?: string
+  recentChange?: number // 최근 변동액
 }
 
-// 포인트 잔액을 보여주는 카드 컴포넌트
-// 현재 보유 포인트와 회원 등급을 표시하고, 충전/거래내역 버튼 포함
-export function BalanceCard({ balance, memberGrade, userName }: BalanceCardProps) {
-  // 숫자를 한국 형식으로 포맷팅 (1,000 단위 콤마)
+export function BalanceCard({ 
+  balance, 
+  memberGrade, 
+  userName,
+  userImage,
+  recentChange 
+}: BalanceCardProps) {
   const formatBalance = (amount: number) => {
     return new Intl.NumberFormat('ko-KR').format(amount)
   }
 
-  // 회원 등급에 따른 배지 컴포넌트 반환
   const getGradeBadge = () => {
     switch (memberGrade) {
       case 'ADMIN':
@@ -34,39 +45,104 @@ export function BalanceCard({ balance, memberGrade, userName }: BalanceCardProps
   }
 
   return (
-    <Card className="relative overflow-hidden">
-      {/* 배경 장식용 그라디언트 원 */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full -mr-32 -mt-32" />
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-            보유 포인트
+    <Card className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white border-0 shadow-xl">
+      {/* 배경 패턴 */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -mr-48 -mt-48 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full -ml-32 -mb-32 blur-2xl" />
+      </div>
+
+      <CardHeader className="relative z-10 pb-2">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border-2 border-white/20">
+              <AvatarImage src={userImage} alt={userName || ''} />
+              <AvatarFallback className="bg-purple-500 text-white">
+                {userName?.[0] || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm text-purple-100">안녕하세요,</p>
+              <p className="font-semibold text-lg">{userName || '회원'}님!</p>
+            </div>
           </div>
-        </CardTitle>
-        {/* 회원 등급 배지 표시 */}
-        {getGradeBadge()}
-      </CardHeader>
-      <CardContent>
-        {/* 포인트 잔액 표시 - 그라디언트 텍스트 스타일 */}
-        <div className="text-3xl font-bold gradient-text">
-          {formatBalance(balance)} P
+          <div className="flex items-center gap-2">
+            {getGradeBadge()}
+            <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
+              <Bell className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
-        {/* 사용자 이름 표시 (선택적) */}
-        <p className="text-xs text-muted-foreground mt-1">
-          {userName && `${userName}님의 포인트`}
-        </p>
-        {/* 행동 버튼들 - 충전하기, 거래내역 */}
-        <div className="flex gap-2 mt-4">
-          <Button asChild size="sm" variant="gradient" className="flex-1">
-            <Link href="/points/charge">
-              충전하기
-              <ArrowUpRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="outline" className="flex-1">
-            <Link href="/points">거래내역</Link>
-          </Button>
+      </CardHeader>
+
+      <CardContent className="relative z-10 space-y-6">
+        {/* 잔액 표시 */}
+        <div>
+          <p className="text-sm text-purple-200 mb-1">Total Balance</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-bold">{formatBalance(balance)}</span>
+            <span className="text-xl text-purple-200">P</span>
+          </div>
+          {recentChange && (
+            <div className="flex items-center gap-1 mt-2">
+              <TrendingUp className={`h-4 w-4 ${recentChange > 0 ? 'text-green-400' : 'text-red-400'}`} />
+              <span className={`text-sm ${recentChange > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {recentChange > 0 ? '+' : ''}{formatBalance(recentChange)}
+              </span>
+              <span className="text-xs text-purple-300">오늘</span>
+            </div>
+          )}
+        </div>
+
+        {/* 액션 버튼들 */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/points/charge">
+            <Button 
+              size="lg" 
+              className="w-full bg-white text-purple-700 hover:bg-purple-50 shadow-lg"
+            >
+              <Send className="mr-2 h-5 w-5" />
+              포인트 충전
+            </Button>
+          </Link>
+          <Link href="/vouchers/purchase">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="w-full border-white/20 text-white hover:bg-white/10"
+            >
+              <CreditCard className="mr-2 h-5 w-5" />
+              바인권 구매
+            </Button>
+          </Link>
+        </div>
+
+        {/* 빠른 메뉴 */}
+        <div className="grid grid-cols-4 gap-4 pt-4 border-t border-white/10">
+          <Link href="/points" className="text-center group">
+            <div className="mx-auto w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <Wallet className="h-5 w-5" />
+            </div>
+            <p className="text-xs mt-2 text-purple-200">거래내역</p>
+          </Link>
+          <Link href="/vouchers" className="text-center group">
+            <div className="mx-auto w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <p className="text-xs mt-2 text-purple-200">바인권</p>
+          </Link>
+          <Link href="/tournaments" className="text-center group">
+            <div className="mx-auto w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <p className="text-xs mt-2 text-purple-200">토너먼트</p>
+          </Link>
+          <Link href="/profile" className="text-center group">
+            <div className="mx-auto w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <ArrowUpRight className="h-5 w-5" />
+            </div>
+            <p className="text-xs mt-2 text-purple-200">더보기</p>
+          </Link>
         </div>
       </CardContent>
     </Card>
