@@ -27,6 +27,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@tanstack/react-query": "^5.18.1",
     "@tanstack/react-table": "^8.11.8",
+    "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
@@ -36,6 +37,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.3",
+    "recharts": "^2.10.4",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",
@@ -43,6 +45,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.16",
+    "@types/bcryptjs": "^2.4.6",
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
