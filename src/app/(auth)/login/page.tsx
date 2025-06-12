@@ -2,6 +2,13 @@
 
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
+
+/**
+ * 로그인 페이지
+ * - Google OAuth를 통한 소셜 로그인
+ * - 그라데이션 배경과 글래스모피즘 디자인
+ * - 로딩 상태와 에러 처리
+ */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
@@ -11,9 +18,11 @@ import { Loader2 } from 'lucide-react';
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
+  // Google 로그인 처리
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
+      // NextAuth Google OAuth 로그인 호출
       await signIn('google', { callbackUrl: '/dashboard' });
     } catch (error) {
       console.error('Login error:', error);
@@ -24,14 +33,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-purple-50 p-4">
-      {/* 배경 장식 */}
+      {/* 배경 장식 - 애니메이션 물방울 효과 */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* 로그인 카드 */}
+      {/* 로그인 카드 - 글래스모피즘 효과 적용 */}
       <Card className="w-full max-w-md relative z-10 glass shadow-2xl">
         <CardHeader className="text-center space-y-1">
           <div className="mx-auto mb-4">

@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 포인트 충전 페이지
+ * - 충전 금액 선택 (프리셋 버튼 또는 직접 입력)
+ * - 카카오페이 또는 계좌이체 선택
+ * - 참조 코드 자동 생성 및 복사 기능
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +28,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-// 충전 금액 프리셋
+// 충전 금액 프리셋 - 자주 사용하는 금액
 const CHARGE_PRESETS = [
   { amount: 50000, label: '5만원' },
   { amount: 100000, label: '10만원' },
@@ -53,21 +60,25 @@ export default function ChargePage() {
     redirect('/login');
   }
 
+  // 프리셋 버튼 클릭 처리
   const handlePresetClick = (presetAmount: number) => {
     setAmount(presetAmount.toString());
     setSelectedPreset(presetAmount);
   };
 
+  // 금액 입력 처리 - 숫자만 허용
   const handleAmountChange = (value: string) => {
-    // 숫자만 입력 가능
+    // 숫자만 입력 가능하도록 필터링
     const numericValue = value.replace(/[^0-9]/g, '');
     setAmount(numericValue);
-    setSelectedPreset(null);
+    setSelectedPreset(null); // 직접 입력 시 프리셋 선택 해제
   };
 
+  // 충전 신청 처리 - 유효성 검사 후 결제 정보 표시
   const handleSubmit = () => {
     const chargeAmount = parseInt(amount);
     
+    // 최소 금액 확인
     if (!chargeAmount || chargeAmount < 10000) {
       toast({
         title: '충전 금액 오류',
@@ -89,6 +100,7 @@ export default function ChargePage() {
     setShowPaymentInfo(true);
   };
 
+  // 클립보드 복사 기능 - 참조코드나 계좌번호 복사
   const copyToClipboard = async (text: string, type: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -112,6 +124,7 @@ export default function ChargePage() {
     return parseInt(value).toLocaleString('ko-KR');
   };
 
+  // 환경변수에서 계좌 정보 가져오기 (설정 안 되어 있으면 기본값 사용)
   const bankAccount = process.env.NEXT_PUBLIC_BANK_ACCOUNT || '국민은행 123-456-789012';
   const accountHolder = process.env.NEXT_PUBLIC_ACCOUNT_HOLDER || '홍길동';
 

@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 바인권 구매 페이지
+ * - Buy-in/Re-buy 바인권 선택
+ * - 회원 등급별 차등 가격 적용
+ * - 포인트 잔액 확인 및 구매 처리
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,7 +30,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-// 임시 가격 데이터
+// 임시 가격 데이터 (실제로는 API에서 가져옴)
 const voucherPrices = {
   BUY_IN: {
     REGULAR: 100000,
@@ -35,7 +42,7 @@ const voucherPrices = {
   },
 };
 
-// 임시 잔액 데이터
+// 임시 잔액 데이터 (실제로는 API에서 가져옴)
 const mockBalance = 500000;
 
 export default function VoucherPurchasePage() {
@@ -58,11 +65,13 @@ export default function VoucherPurchasePage() {
     redirect('/login');
   }
 
+  // 회원 등급에 따른 가격 계산
   const memberGrade = session.user.memberGrade || 'GUEST';
   const unitPrice = voucherPrices[voucherType][memberGrade as 'REGULAR' | 'GUEST'];
   const totalPrice = unitPrice * quantity;
   const hasEnoughBalance = mockBalance >= totalPrice;
 
+  // 수량 변경 처리 (1~10개 제한)
   const handleQuantityChange = (change: number) => {
     const newQuantity = quantity + change;
     if (newQuantity >= 1 && newQuantity <= 10) {
@@ -70,7 +79,9 @@ export default function VoucherPurchasePage() {
     }
   };
 
+  // 바인권 구매 처리
   const handlePurchase = async () => {
+    // 잔액 부족 확인
     if (!hasEnoughBalance) {
       toast({
         title: '잔액 부족',

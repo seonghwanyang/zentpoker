@@ -8,10 +8,20 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MemberBadge } from '@/components/members/member-badge';
 
+/**
+ * 헤더 컴포넌트
+ * - 전체 페이지 상단에 고정되는 네비게이션 바
+ * - 로그인 상태에 따라 다른 메뉴 표시
+ * - 모바일 반응형 메뉴 포함
+ */
+
 export function Header() {
+  // NextAuth 세션 정보 가져오기
   const { data: session, status } = useSession();
+  // 모바일 메뉴 열림/닫힘 상태
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // 모바일 메뉴 토글 함수
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
@@ -177,6 +187,7 @@ export function Header() {
 
 // signOut 함수 임시 구현 (NextAuth 설정 전)
 function signOut() {
-  // NextAuth 설정 후 실제 구현으로 변경 필요
+  // TODO: NextAuth 설정 후 실제 구현으로 변경 필요
+  // 실제로는 import { signOut } from 'next-auth/react' 사용
   console.log('로그아웃');
 }

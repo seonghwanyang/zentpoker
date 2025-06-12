@@ -2,6 +2,13 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 회원 대시보드 페이지
+ * - 포인트 잔액과 최근 변동 표시
+ * - 보유 바인권과 최근 거래 내역
+ * - 통계 카드로 주요 정보 요약
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { BalanceCard } from '@/components/points/balance-card';
 import { VoucherCard } from '@/components/vouchers/voucher-card';
@@ -20,6 +27,7 @@ import {
 import Link from 'next/link';
 
 // 임시 데이터 (실제로는 API에서 가져옴)
+// 실제 구현 시 React Query나 SWR로 데이터 페칭 처리
 const mockData = {
   balance: 3756000,
   recentChange: 250000,
@@ -57,6 +65,7 @@ export default function DashboardPage() {
     return new Intl.NumberFormat('ko-KR').format(Math.abs(amount));
   };
 
+  // 상대적 시간 표시 - 방금 전, N시간 전, 날짜
   const formatDate = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -76,7 +85,7 @@ export default function DashboardPage() {
           <p className="text-gray-500 mt-1">환영합니다, {session.user.name}님!</p>
         </div>
 
-        {/* 게스트 알림 */}
+        {/* 게스트 회원 알림 - 정회원 승급 안내 */}
         {session.user.memberGrade === 'GUEST' && (
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="flex items-center gap-3 p-4">
@@ -107,7 +116,7 @@ export default function DashboardPage() {
           recentChange={mockData.recentChange}
         />
 
-        {/* 통계 카드들 */}
+        {/* 통계 카드들 - 보유 바인권, 이번 달 사용, 참가 대기, 승률 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

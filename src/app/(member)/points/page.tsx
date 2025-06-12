@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 포인트 거래 내역 페이지
+ * - 포인트 충전, 사용, 환불 내역을 표시
+ * - 검색, 필터링, 기간 선택 기능
+ * - 통계 카드로 요약 정보 제공
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,7 +35,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// 임시 거래 데이터
+// 임시 거래 데이터 (실제로는 API에서 가져옴)
 const mockTransactions = [
   {
     id: '1',
@@ -76,6 +83,7 @@ const mockTransactions = [
   },
 ];
 
+// 거래 타입과 상태 타입 정의
 type TransactionType = 'ALL' | 'CHARGE' | 'PURCHASE' | 'REFUND';
 type TransactionStatus = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED';
 
@@ -100,7 +108,7 @@ export default function PointsPage() {
     redirect('/login');
   }
 
-  // 필터링된 거래 목록
+  // 선택된 필터와 검색어에 따라 거래 목록 필터링
   const filteredTransactions = mockTransactions.filter(transaction => {
     if (filterType !== 'ALL' && transaction.type !== filterType) return false;
     if (filterStatus !== 'ALL' && transaction.status !== filterStatus) return false;
@@ -165,7 +173,7 @@ export default function PointsPage() {
     }
   };
 
-  // 통계 계산
+  // 통계 계산 - 총 충전액, 총 사용액
   const totalCharged = mockTransactions
     .filter(t => t.type === 'CHARGE' && t.status === 'COMPLETED')
     .reduce((sum, t) => sum + t.amount, 0);

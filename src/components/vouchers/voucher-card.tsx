@@ -5,14 +5,21 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CalendarDays, Ticket } from 'lucide-react'
 
+/**
+ * 바인권 카드 컴포넌트
+ * - Buy-in/Re-buy 바인권 표시
+ * - 사용 상태, 유효기간, 토너먼트 정보
+ * - 만료 임박 바인권 경고 표시
+ */
+
 // 바인권 카드 컴포넌트의 Props 타입 정의
 interface VoucherCardProps {
-  type: 'BUYIN' | 'REBUY'           // 바인권 타입 (바인/리바인)
-  status: 'ACTIVE' | 'USED' | 'EXPIRED'  // 바인권 상태
-  purchasePrice: number             // 구매 가격
-  expiresAt?: Date                  // 만료일 (선택적)
-  usedAt?: Date                     // 사용일 (선택적)
-  onUse?: () => void                // 사용하기 버튼 클릭 핸들러
+  type: 'BUYIN' | 'REBUY'                    // 바인권 타입 (바인/리바인)
+  status: 'ACTIVE' | 'USED' | 'EXPIRED'     // 바인권 상태
+  purchasePrice: number                      // 구매 가격
+  expiresAt?: Date                          // 만료일 (선택적)
+  usedAt?: Date                             // 사용일 (선택적)
+  onUse?: () => void                        // 사용하기 버튼 클릭 핸들러
 }
 
 // 바인권 정보를 표시하는 카드 컴포넌트

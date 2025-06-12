@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 프로필 페이지
+ * - 회원 정보 표시 및 수정
+ * - 활동 통계 표시 (총 게임 수, 승률, 상금 등)
+ * - 업적/뱃지 시스템
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +33,7 @@ import {
   Activity,
 } from 'lucide-react';
 
-// 임시 통계 데이터
+// 임시 통계 데이터 (실제로는 API에서 가져옴)
 const mockStats = {
   totalGames: 45,
   winRate: 42.5,
@@ -59,7 +66,7 @@ export default function ProfilePage() {
     redirect('/login');
   }
 
-  // 폼 데이터 초기화
+  // 폼 데이터 초기화 - 세션 정보로 채우기
   if (!formData.name && session.user) {
     setFormData({
       name: session.user.name || '',
@@ -68,15 +75,17 @@ export default function ProfilePage() {
     });
   }
 
+  // 입력 필드 변경 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // 프로필 업데이트 처리
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 실제로는 API 호출
+    // TODO: 실제 API 호출로 변경 필요
     toast({
       title: '프로필 업데이트 완료',
       description: '프로필 정보가 성공적으로 업데이트되었습니다.',
@@ -93,6 +102,7 @@ export default function ProfilePage() {
     }).format(date);
   };
 
+  // 마지막 활동 시간 포맷팅 - 상대적 시간 표시
   const formatLastActive = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();

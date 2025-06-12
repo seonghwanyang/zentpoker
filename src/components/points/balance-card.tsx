@@ -4,6 +4,14 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+/**
+ * 포인트 잔액 카드 컴포넌트
+ * - 레퍼런스 디자인 적용 (보라색 그라데이션)
+ * - 사용자 정보와 잔액 표시
+ * - 빠른 액션 버튼 (충전, 바인권 구매)
+ * - 하단 빠른 메뉴 링크
+ */
 import { 
   ArrowUpRight, 
   Wallet, 
@@ -14,12 +22,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+// Props 타입 정의
 interface BalanceCardProps {
-  balance: number
-  memberGrade: 'GUEST' | 'REGULAR' | 'ADMIN'
-  userName?: string
-  userImage?: string
-  recentChange?: number // 최근 변동액
+  balance: number               // 현재 포인트 잔액
+  memberGrade: 'GUEST' | 'REGULAR' | 'ADMIN'  // 회원 등급
+  userName?: string             // 사용자 이름
+  userImage?: string            // 프로필 이미지 URL
+  recentChange?: number         // 최근 변동액 (오늘 기준)
 }
 
 export function BalanceCard({ 
@@ -29,10 +38,12 @@ export function BalanceCard({
   userImage,
   recentChange 
 }: BalanceCardProps) {
+  // 숫자를 한국 형식으로 포맷팅 (1,000 단위 콤마)
   const formatBalance = (amount: number) => {
     return new Intl.NumberFormat('ko-KR').format(amount)
   }
 
+  // 회원 등급에 따른 배지 컴포넌트 반환
   const getGradeBadge = () => {
     switch (memberGrade) {
       case 'ADMIN':
@@ -46,7 +57,7 @@ export function BalanceCard({
 
   return (
     <Card className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 text-white border-0 shadow-xl">
-      {/* 배경 패턴 */}
+      {/* 배경 패턴 - 부드러운 그라데이션 효과 */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -mr-48 -mt-48 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full -ml-32 -mb-32 blur-2xl" />
@@ -76,13 +87,14 @@ export function BalanceCard({
       </CardHeader>
 
       <CardContent className="relative z-10 space-y-6">
-        {/* 잔액 표시 */}
+        {/* 잔액 표시 영역 */}
         <div>
           <p className="text-sm text-purple-200 mb-1">Total Balance</p>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold">{formatBalance(balance)}</span>
             <span className="text-xl text-purple-200">P</span>
           </div>
+          {/* 최근 변동액 표시 (옵셔널) */}
           {recentChange && (
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp className={`h-4 w-4 ${recentChange > 0 ? 'text-green-400' : 'text-red-400'}`} />

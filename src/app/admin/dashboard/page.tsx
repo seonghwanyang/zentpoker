@@ -2,6 +2,13 @@
 
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+
+/**
+ * 관리자 대시보드 페이지
+ * - 주요 통계 표시 (회원 수, 수익, 바인권 등)
+ * - 입금 대기 목록과 최근 가입 회원
+ * - 빠른 작업 링크
+ */
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +27,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// 임시 대시보드 데이터
+// 임시 대시보드 데이터 (실제로는 API에서 가져옴)
 const mockDashboardData = {
   stats: {
     totalMembers: 87,
@@ -103,6 +110,7 @@ export default function AdminDashboardPage() {
     );
   }
 
+  // 관리자 권한 체크
   if (!session || session.user.role !== 'ADMIN') {
     redirect('/dashboard');
   }
@@ -111,6 +119,7 @@ export default function AdminDashboardPage() {
     return new Intl.NumberFormat('ko-KR').format(amount);
   };
 
+  // 상대적 시간 표시 (분/시간/일 전)
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -140,7 +149,7 @@ export default function AdminDashboardPage() {
           <p className="text-gray-500 mt-1">동호회 운영 현황을 한눈에 확인하세요</p>
         </div>
 
-        {/* 입금 대기 알림 */}
+        {/* 입금 대기 알림 - 확인 대기 중인 입금이 있을 때만 표시 */}
         {mockDashboardData.stats.pendingDeposits > 0 && (
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="flex items-center justify-between p-4">
@@ -165,7 +174,7 @@ export default function AdminDashboardPage() {
           </Card>
         )}
 
-        {/* 주요 통계 */}
+        {/* 주요 통계 카드 - 회원 수, 오늘 수익, 이달 수익, 발급 바인권 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
