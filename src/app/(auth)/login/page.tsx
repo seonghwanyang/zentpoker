@@ -1,35 +1,89 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-
-/**
- * 로그인 페이지
- * - Google OAuth를 통한 소셜 로그인
- * - 그라데이션 배경과 글래스모피즘 디자인
- * - 로딩 상태와 에러 처리
- */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+
+  // 이미 로그인된 경우 대시보드로 리다이렉트
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/dashboard');
+    }
+  }, [status, router]);
+
+  // URL 파라미터에서 에러 메시지 확인
+  useEffect(() => {
+    const urlError = searchParams.get('error');
+    if (urlError) {
+      switch (urlError) {
+        case 'OAuthSignin':
+          setError('OAuth 로그인 시작 중 오류가 발생했습니다.');
+          break;
+        case 'OAuthCallback':
+          setError('OAuth 콜백 처리 중 오류가 발생했습니다.');
+          break;
+        case 'OAuthCreateAccount':
+          setError('OAuth 계정 생성 중 오류가 발생했습니다.');
+          break;
+        case 'EmailCreateAccount':
+          setError('이메일 계정 생성 중 오류가 발생했습니다.');
+          break;
+        case 'Callback':
+          setError('콜백 처리 중 오류가 발생했습니다.');
+          break;
+        case 'AccessDenied':
+          setError('접근이 거부되었습니다.');
+          break;
+        default:
+          setError('로그인 중 오류가 발생했습니다.');
+      }
+    }
+  }, [searchParams]);
 
   // Google 로그인 처리
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
+      // callbackUrl 파라미터 확인
+      const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+      
       // NextAuth Google OAuth 로그인 호출
-      await signIn('google', { callbackUrl: '/dashboard' });
+      const result = await signIn('google', { 
+        callbackUrl,
+        redirect: true // 리다이렉트 활성화
+      });
+      
+      console.log('SignIn result:', result);
     } catch (error) {
       console.error('Login error:', error);
+      setError('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // 로딩 중이거나 인증 확인 중일 때
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-purple-50 p-4">
@@ -52,6 +106,13 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* 에러 메시지 표시 */}
+          {error && (
+            <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
+
           <Button
             onClick={handleGoogleLogin}
             disabled={isLoading}

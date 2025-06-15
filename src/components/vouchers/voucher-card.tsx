@@ -73,6 +73,12 @@ export function VoucherCard({
           icon: <Ticket className="h-5 w-5" />,
           gradient: 'from-pink-500 to-pink-700',      // 분홍색 그라디언트
         }
+      default:
+        return {
+          title: '바인권',
+          icon: <Ticket className="h-5 w-5" />,
+          gradient: 'from-purple-500 to-purple-700',  // 기본값
+        }
     }
   }
 

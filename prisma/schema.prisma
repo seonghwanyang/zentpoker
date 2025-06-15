@@ -55,10 +55,12 @@ enum VoucherStatus {
 model User {
   id            String          @id @default(cuid())  // 고유 ID
   email         String          @unique               // 이메일 (중복 불가)
+  emailVerified DateTime?                            // 이메일 인증 시간 (NextAuth 필수)
   name          String?                              // 이름 (선택적)
   image         String?                              // 프로필 이미지 URL
   phone         String?                              // 전화번호 (입금 확인용)
   grade         MemberGrade     @default(GUEST)      // 회원 등급 (기본: 게스트)
+  role          String          @default("USER")     // 사용자 역할 (USER/ADMIN)
   points        Int             @default(0)          // 현재 포인트 잔액
   isActive      Boolean         @default(true)       // 활성 상태
   createdAt     DateTime        @default(now())      // 가입일
@@ -106,6 +108,15 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// NextAuth 이메일 인증 토큰
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 // 포인트 거래 내역
