@@ -2,6 +2,17 @@ self.__BUILD_MANIFEST = {
   "polyfillFiles": [
     "static/chunks/polyfills.js"
   ],
+<<<<<<< HEAD
+  "devFiles": [],
+  "ampDevFiles": [],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/webpack.js",
+    "static/chunks/main-app.js"
+  ],
+  "pages": {
+    "/_app": []
+=======
   "devFiles": [
     "static/chunks/fallback/react-refresh.js"
   ],
@@ -22,6 +33,7 @@ self.__BUILD_MANIFEST = {
       "static/chunks/fallback/main.js",
       "static/chunks/fallback/pages/_error.js"
     ]
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
   },
   "ampFirstPages": []
 };

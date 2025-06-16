@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+<<<<<<< HEAD
+import { ChartTooltipProps } from '@/types/prisma'
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 import {
   Select,
   SelectContent,
@@ -82,12 +86,20 @@ export default function AdminReportsPage() {
   }
 
   // 커스텀 툴팁
+<<<<<<< HEAD
+  const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
+=======
   const CustomTooltip = ({ active, payload, label }: any) => {
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border rounded-lg shadow-lg p-3">
           <p className="text-sm font-medium">{label}</p>
+<<<<<<< HEAD
+          {payload.map((entry, index) => (
+=======
           {payload.map((entry: any, index: number) => (
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.value.toLocaleString()}
               {entry.name === 'revenue' ? '원' : '건'}

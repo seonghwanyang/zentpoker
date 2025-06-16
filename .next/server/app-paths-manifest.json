@@ -1,3 +1,13 @@
 {
+<<<<<<< HEAD
+  "/page": "app/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/(member)/dashboard/page": "app/(member)/dashboard/page.js",
+  "/(member)/points/page": "app/(member)/points/page.js",
+  "/(member)/vouchers/page": "app/(member)/vouchers/page.js",
+  "/(member)/tournaments/page": "app/(member)/tournaments/page.js",
+  "/(member)/profile/page": "app/(member)/profile/page.js"
+=======
   "/_not-found/page": "app/_not-found/page.js"
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 }

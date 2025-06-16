@@ -1,5 +1,11 @@
 {
   "pages": {
+<<<<<<< HEAD
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+=======
     "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -9,6 +15,7 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/_not-found/page.js"
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -25,6 +32,44 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/loading.js"
+<<<<<<< HEAD
+    ],
+    "/not-found": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/not-found.js"
+    ],
+    "/(member)/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/dashboard/page.js"
+    ],
+    "/(member)/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/loading.js"
+    ],
+    "/(member)/points/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/points/page.js"
+    ],
+    "/(member)/vouchers/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/vouchers/page.js"
+    ],
+    "/(member)/tournaments/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/tournaments/page.js"
+    ],
+    "/(member)/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(member)/profile/page.js"
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     ]
   }
 }
