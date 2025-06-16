@@ -239,7 +239,10 @@ export default function DashboardPage() {
                 {mockData.vouchers.slice(0, 2).map((voucher) => (
                   <VoucherCard
                     key={voucher.id}
-                    voucher={voucher}
+                    type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
+                    status="ACTIVE"
+                    purchasePrice={100000}
+                    expiresAt={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
                     onUse={() => console.log('Use voucher:', voucher.id)}
                   />
                 ))}

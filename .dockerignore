@@ -1,0 +1,62 @@
+# 도커 이미지에서 제외할 파일들
+
+# 의존성
+node_modules
+npm-debug.log*
+
+# Next.js 빌드 결과물
+.next/
+out/
+
+# 환경 변수
+.env*.local
+.env
+.env.local
+.env.production.local
+
+# 로그 파일
+*.log
+
+# 런타임 데이터
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 디렉토리
+.nyc_output
+
+# IDE 설정
+.vscode/
+.idea/
+
+# OS 생성 파일
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# 테스트
+coverage/
+.nyc_output
+.jest-cache
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# 문서
+README.md
+docs/
+*.md
+
+# 기타
+.env.example

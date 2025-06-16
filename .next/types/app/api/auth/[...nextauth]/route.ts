@@ -1,4 +1,4 @@
-// File: C:\Users\msd12\OneDrive\Desktop\zentpoker-main\src\app\api\auth\[...nextauth]\route.ts
+// File: C:\Users\user\Desktop\Business\Zent_poker\Zentpoker_code\src\app\api\auth\[...nextauth]\route.ts
 import * as entry from '../../../../../../src/app/api/auth/[...nextauth]/route.js'
 import type { NextRequest } from 'next/server.js'
 

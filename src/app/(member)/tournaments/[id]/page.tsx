@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { VoucherCard } from '@/components/voucher-card'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { VoucherCard } from '@/components/vouchers/voucher-card'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { toast } from '@/components/ui/use-toast'
 import { 
   Calendar, 
@@ -256,7 +256,12 @@ export default function TournamentDetailPage() {
                       }`}
                       onClick={() => setSelectedVoucher(voucher.id)}
                     >
-                      <VoucherCard voucher={voucher} />
+                      <VoucherCard 
+                        type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
+                        status={voucher.status}
+                        purchasePrice={voucher.price}
+                        expiresAt={new Date(voucher.expiresAt)}
+                      />
                       {selectedVoucher === voucher.id && (
                         <div className="absolute top-2 right-2">
                           <CheckCircle className="h-6 w-6 text-green-500" />

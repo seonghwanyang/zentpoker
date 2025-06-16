@@ -1,197 +1,116 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/auth-options'
-import { prisma } from '@/lib/prisma'
+import { 
+  requireAdmin, 
+  withErrorHandling, 
+  createSuccessResponse, 
+  parseAndValidateBody,
+  ApiError 
+} from '@/lib/api/middleware';
+import { 
+  completePointChargeTransaction, 
+  failPaymentTransaction 
+} from '@/lib/db/transactions';
+import { paymentConfirmSchema } from '@/lib/utils/validation';
+import { prisma } from '@/lib/prisma';
 
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+interface PaymentConfirmRequest {
+  transactionId: string;
+  paymentId: string;
+  status: 'APPROVED' | 'REJECTED';
+  memo?: string;
+  rejectReason?: string;
+}
 
-    // 관리자 권한 확인
-    const admin = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true, role: true }
-    })
+async function handlePaymentConfirm(request: Request) {
+  // 1. 관리자 권한 확인
+  const admin = await requireAdmin();
 
-    if (!admin || admin.role !== 'ADMIN') {
-      return NextResponse.json(
-        { success: false, error: 'Admin access required' },
-        { status: 403 }
-      )
-    }
+  // 2. 요청 데이터 검증
+  const body = await parseAndValidateBody(request, (data) => {
+    return paymentConfirmSchema.parse(data);
+  });
 
-    const body = await request.json()
-    const { transactionId, action, memo } = body
+  const { transactionId, paymentId, status, memo, rejectReason } = body as PaymentConfirmRequest;
 
-    // 유효성 검사
-    if (!transactionId || !action) {
-      return NextResponse.json(
-        { success: false, error: '필수 정보가 누락되었습니다.' },
-        { status: 400 }
-      )
-    }
+  // 3. 트랜잭션 조회 및 검증
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+    include: { user: true },
+  });
 
-    if (!['CONFIRM', 'REJECT'].includes(action)) {
-      return NextResponse.json(
-        { success: false, error: '올바른 액션이 아닙니다.' },
-        { status: 400 }
-      )
-    }
+  if (!transaction) {
+    throw new ApiError('트랜잭션을 찾을 수 없습니다.', 404, 'TRANSACTION_NOT_FOUND');
+  }
 
-    if (action === 'REJECT' && !memo) {
-      return NextResponse.json(
-        { success: false, error: '거절 사유를 입력해주세요.' },
-        { status: 400 }
-      )
-    }
+  if (transaction.type !== 'CHARGE' || transaction.status !== 'PENDING') {
+    throw new ApiError('처리할 수 없는 트랜잭션입니다.', 400, 'INVALID_TRANSACTION_STATUS');
+  }
 
-    // 거래 조회
-    const transaction = await prisma.transaction.findUnique({
+  // 4. 결제 조회 및 검증
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+  });
+
+  if (!payment || payment.transactionId !== transactionId) {
+    throw new ApiError('결제 정보를 찾을 수 없습니다.', 404, 'PAYMENT_NOT_FOUND');
+  }
+
+  // 5. 승인/거절 처리
+  let result;
+  if (status === 'APPROVED') {
+    result = await completePointChargeTransaction({
+      transactionId,
+      paymentId,
+      externalTransactionId: `ADMIN_APPROVED_${Date.now()}`,
+    });
+
+    // 메타데이터에 관리자 정보 추가
+    await prisma.transaction.update({
       where: { id: transactionId },
-      include: { user: true }
-    })
-
-    if (!transaction || transaction.type !== 'CHARGE' || transaction.status !== 'PENDING') {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 거래입니다.' },
-        { status: 400 }
-      )
-    }
-
-    // 트랜잭션으로 처리
-    const result = await prisma.$transaction(async (tx) => {
-      if (action === 'CONFIRM') {
-        // 1. 사용자 포인트 증가
-        await tx.user.update({
-          where: { id: transaction.userId },
-          data: { points: { increment: transaction.amount } }
-        })
-
-        // 2. 거래 상태 업데이트
-        const updatedTransaction = await tx.transaction.update({
-          where: { id: transactionId },
-          data: {
-            status: 'COMPLETED',
-            metadata: {
-              ...(transaction.metadata as any || {}),
-              confirmedBy: admin.id,
-              confirmedAt: new Date().toISOString(),
-              memo
-            }
-          }
-        })
-
-        return updatedTransaction
-      } else {
-        // 거래 거절
-        const updatedTransaction = await tx.transaction.update({
-          where: { id: transactionId },
-          data: {
-            status: 'CANCELLED',
-            metadata: {
-              ...(transaction.metadata as any || {}),
-              rejectedBy: admin.id,
-              rejectedAt: new Date().toISOString(),
-              rejectReason: memo
-            }
-          }
-        })
-
-        return updatedTransaction
-      }
-    })
-
-    return NextResponse.json({
-      success: true,
       data: {
-        transactionId: result.id,
-        action,
-        memo,
-        processedAt: new Date().toISOString(),
-        processedBy: session.user.email,
+        metadata: {
+          ...result.metadata,
+          confirmedBy: admin.id,
+          confirmedAt: new Date().toISOString(),
+          memo,
+        },
       },
-    })
-  } catch (error) {
-    console.error('Payment confirmation error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to process payment confirmation' },
-      { status: 500 }
-    )
+    });
+  } else {
+    await failPaymentTransaction({
+      transactionId,
+      paymentId,
+      reason: rejectReason || '관리자에 의해 거절됨',
+    });
+
+    // 메타데이터에 관리자 정보 추가
+    result = await prisma.transaction.update({
+      where: { id: transactionId },
+      data: {
+        metadata: {
+          ...transaction.metadata,
+          rejectedBy: admin.id,
+          rejectedAt: new Date().toISOString(),
+          rejectReason,
+          memo,
+        },
+      },
+    });
   }
+
+  const message = status === 'APPROVED' 
+    ? '결제가 승인되었습니다.' 
+    : '결제가 거절되었습니다.';
+
+  return createSuccessResponse(
+    {
+      transactionId: result.id,
+      status: result.status,
+      amount: result.amount,
+      processedBy: admin.id,
+      processedAt: new Date().toISOString(),
+    },
+    message,
+  );
 }
 
-// 대기 중인 입금 확인 목록 조회
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    // 관리자 권한 확인
-    const admin = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { role: true }
-    })
-
-    if (!admin || admin.role !== 'ADMIN') {
-      return NextResponse.json(
-        { success: false, error: 'Admin access required' },
-        { status: 403 }
-      )
-    }
-
-    // 대기 중인 충전 요청 조회
-    const pendingPayments = await prisma.transaction.findMany({
-      where: {
-        type: 'CHARGE',
-        status: 'PENDING'
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    })
-
-    // 데이터 포맷팅
-    const formattedPayments = pendingPayments.map(payment => ({
-      id: payment.id,
-      userId: payment.user.id,
-      userName: payment.user.name || '미입력',
-      userEmail: payment.user.email || '',
-      amount: payment.amount,
-      referenceCode: (payment.metadata as any)?.referenceCode || '',
-      paymentMethod: (payment.metadata as any)?.paymentMethod || 'UNKNOWN',
-      requestedAt: payment.createdAt.toISOString(),
-      status: payment.status,
-    }))
-
-    return NextResponse.json({
-      success: true,
-      data: formattedPayments,
-    })
-  } catch (error) {
-    console.error('Pending payments fetch error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch pending payments' },
-      { status: 500 }
-    )
-  }
-}
+export const POST = withErrorHandling(handlePaymentConfirm);

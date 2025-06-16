@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from '@/components/ui/use-toast'
 import { CalendarIcon, Save, Trophy } from 'lucide-react'
+import { TournamentType } from '@/types/prisma'
 
 // 폼 스키마
 const tournamentSchema = z.object({
@@ -133,7 +134,7 @@ export default function CreateTournamentPage() {
                 <Label htmlFor="type">토너먼트 유형 *</Label>
                 <Select
                   defaultValue="REGULAR"
-                  onValueChange={(value) => setValue('type', value as any)}
+                  onValueChange={(value) => setValue('type', value as TournamentType)}
                 >
                   <SelectTrigger id="type">
                     <SelectValue />

@@ -245,9 +245,12 @@ export default function VouchersPage() {
                     {filteredVouchers.map((voucher) => (
                       <VoucherCard
                         key={voucher.id}
-                        voucher={voucher}
-                        onUse={() => {
-                          // 실제로는 토너먼트 참가 페이지로 이동
+                        type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
+                        status={voucher.isUsed ? 'USED' : (voucher.expiresAt < now ? 'EXPIRED' : 'ACTIVE')}
+                        purchasePrice={100000}
+                        expiresAt={voucher.expiresAt}
+                        usedAt={voucher.usedAt || undefined}
+                        onUse={voucher.isUsed || voucher.expiresAt < now ? undefined : () => {
                           console.log('Use voucher:', voucher.id);
                         }}
                       />

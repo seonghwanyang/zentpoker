@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:15-alpine
+    container_name: zentpoker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: zentpoker
+      POSTGRES_USER: zentpoker_user
+      POSTGRES_PASSWORD: zentpoker_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - zentpoker-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zentpoker_user -d zentpoker"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis (캐싱 및 세션)
+  redis:
+    image: redis:7-alpine
+    container_name: zentpoker-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - zentpoker-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Next.js 애플리케이션 (개발용)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: zentpoker-app-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://zentpoker_user:zentpoker_password@postgres:5432/zentpoker
+      - REDIS_URL=redis://redis:6379
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-secret-key-here
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - zentpoker-network
+    profiles:
+      - dev
+
+  # Next.js 애플리케이션 (프로덕션용)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zentpoker-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://zentpoker_user:zentpoker_password@postgres:5432/zentpoker
+      - REDIS_URL=redis://redis:6379
+      - NEXTAUTH_URL=https://your-domain.com
+      - NEXTAUTH_SECRET=your-secret-key-here
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - zentpoker-network
+    profiles:
+      - prod
+
+  # Nginx (리버스 프록시)
+  nginx:
+    image: nginx:alpine
+    container_name: zentpoker-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    networks:
+      - zentpoker-network
+    profiles:
+      - prod
+
+  # Prisma Studio (데이터베이스 관리용)
+  prisma-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: zentpoker-prisma-studio
+    restart: "no"
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=postgresql://zentpoker_user:zentpoker_password@postgres:5432/zentpoker
+    command: npx prisma studio --hostname 0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - zentpoker-network
+    profiles:
+      - dev
+      - studio
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  zentpoker-network:
+    driver: bridge

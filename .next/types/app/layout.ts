@@ -1,4 +1,4 @@
-// File: C:\Users\msd12\OneDrive\Desktop\zentpoker-main\src\app\layout.tsx
+// File: C:\Users\user\Desktop\Business\Zent_poker\Zentpoker_code\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

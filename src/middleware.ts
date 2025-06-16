@@ -22,10 +22,15 @@ export async function middleware(request: NextRequest) {
   }
 
   // 토큰 가져오기 - secret 명시적으로 전달
-  const token = await getToken({ 
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET!
-  })
+  let token = null;
+  try {
+    token = await getToken({ 
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET || 'development-secret'
+    });
+  } catch (error) {
+    console.error('Token error:', error);
+  }
 
   // 로그인 여부 확인
   const isAuthenticated = !!token
