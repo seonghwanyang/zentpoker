@@ -31,6 +31,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/activity.js":
 /*!**************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/activity.js ***!
@@ -51,6 +52,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/alert-triangle.js":
 /*!********************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/alert-triangle.js ***!
@@ -61,6 +64,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/arrow-down-right.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/arrow-down-right.js ***!
@@ -241,6 +245,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/home.js":
 /*!**********************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/home.js ***!
@@ -251,6 +257,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/layout-dashboard.js":
 /*!**********************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/layout-dashboard.js ***!
@@ -311,6 +318,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/refresh-cw.js":
 /*!****************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/refresh-cw.js ***!
@@ -321,6 +330,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/save.js":
 /*!**********************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/save.js ***!
@@ -441,6 +451,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/x.js":
 /*!*******************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/x.js ***!
@@ -451,6 +463,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/lucide-react/dist/esm/icons/zap.js":
 /*!*********************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/icons/zap.js ***!
@@ -461,6 +474,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/lucide-react/dist/esm/createLucideIcon.js":
 /*!****************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/createLucideIcon.js ***!

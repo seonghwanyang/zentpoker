@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "semi": true,
   "singleQuote": true,
   "tabWidth": 2,
@@ -27,4 +28,12 @@
       }
     }
   ]
+=======
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-tailwindcss"]
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 }

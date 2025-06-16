@@ -30,7 +30,11 @@
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
+<<<<<<< HEAD
 /******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+=======
+/******/ 			__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /******/ 			threw = false;
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
@@ -125,7 +129,11 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
+<<<<<<< HEAD
 /******/ 		__webpack_require__.h = () => ("1a98918b57d28650")
+=======
+/******/ 		__webpack_require__.h = () => ("96958524fae8a26c")
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
@@ -165,11 +173,14 @@
 /******/ 		}
 /******/ 	})();
 /******/ 	
+<<<<<<< HEAD
 /******/ 	/* webpack/runtime/nonce */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nc = undefined;
 /******/ 	})();
 /******/ 	
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /******/ 	/* webpack/runtime/require chunk loading */
 /******/ 	(() => {
 /******/ 		// no baseURI

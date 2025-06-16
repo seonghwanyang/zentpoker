@@ -1,5 +1,6 @@
 // Prisma 스키마 파일
 // 데이터베이스 테이블 구조와 관계를 정의합니다
+<<<<<<< HEAD
 
 generator client {
   provider = "prisma-client-js"
@@ -96,6 +97,97 @@ model Account {
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
+=======
+// 자세한 내용: https://pris.ly/d/prisma-schema
+
+// Prisma 클라이언트 생성 설정
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 데이터베이스 연결 설정
+datasource db {
+  provider  = "postgresql"  // PostgreSQL 사용
+  url       = env("DATABASE_URL")  // 데이터베이스 연결 URL
+  directUrl = env("DIRECT_URL")    // 다이렉트 연결 URL (Supabase용)
+}
+
+// 회원 등급 enum
+enum MemberGrade {
+  GUEST   // 게스트 - 기본 등급, 바인권 할증 가격 적용
+  REGULAR // 정회원 - 할인 가격으로 바인권 구매 가능
+  ADMIN   // 관리자 - 시스템 전체 관리 권한
+}
+
+// 포인트 거래 유형 enum
+enum TransactionType {
+  CHARGE      // 충전 - 포인트 충전
+  PURCHASE    // 구매 - 바인권 구매
+  USE         // 사용 - 포인트/바인권 사용
+  REFUND      // 환불 - 거래 취소/환불
+  ADJUSTMENT  // 관리자 조정 - 수동 포인트 조정
+}
+
+// 거래 상태 enum
+enum TransactionStatus {
+  PENDING    // 대기중 - 입금 확인 대기
+  COMPLETED  // 완료 - 거래 완료
+  CANCELLED  // 취소 - 거래 취소
+  FAILED     // 실패 - 거래 실패
+}
+
+// 바인권 종류 enum
+enum VoucherType {
+  BUYIN    // 바인권 - 최초 참가용
+  REBUY    // 리바인권 - 재참가용
+}
+
+// 바인권 상태 enum
+enum VoucherStatus {
+  ACTIVE    // 사용 가능 - 아직 사용하지 않은 상태
+  USED      // 사용됨 - 토너먼트에 사용된 상태
+  EXPIRED   // 만료됨 - 유효기간 경과
+}
+
+// 사용자 모델 - 시스템의 모든 사용자 정보
+model User {
+  id            String          @id @default(cuid())  // 고유 ID
+  email         String          @unique               // 이메일 (중복 불가)
+  emailVerified DateTime?                            // 이메일 인증 시간 (NextAuth 필수)
+  name          String?                              // 이름 (선택적)
+  image         String?                              // 프로필 이미지 URL
+  phone         String?                              // 전화번호 (입금 확인용)
+  grade         MemberGrade     @default(GUEST)      // 회원 등급 (기본: 게스트)
+  role          String          @default("USER")     // 사용자 역할 (USER/ADMIN)
+  points        Int             @default(0)          // 현재 포인트 잔액
+  isActive      Boolean         @default(true)       // 활성 상태
+  createdAt     DateTime        @default(now())      // 가입일
+  updatedAt     DateTime        @updatedAt           // 수정일
+
+  // 관계 필드들
+  accounts      Account[]         // OAuth 계정 연결
+  sessions      Session[]         // 세션 정보
+  transactions  Transaction[]     // 포인트 거래 내역
+  vouchers      Voucher[]         // 보유 바인권
+  tournaments   TournamentEntry[] // 토너먼트 참가 기록
+  pointLogs     PointLog[]        // 포인트 변동 로그
+
+  @@index([email])  // 이메일 인덱스 (검색 속도 향상)
+  @@index([grade])  // 등급 인덱스 (필터링용)
+}
+
+// NextAuth용 OAuth 계정 모델
+// Google 등 외부 인증 제공자 연결 정보
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  // 연결된 사용자 ID
+  type              String  // 계정 타입
+  provider          String  // 제공자 (google 등)
+  providerAccountId String  // 제공자측 계정 ID
+  refresh_token     String? @db.Text  // 리프레시 토큰
+  access_token      String? @db.Text  // 액세스 토큰
+  expires_at        Int?              // 토큰 만료 시간
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
   token_type        String?
   scope             String?
   id_token          String? @db.Text
@@ -103,19 +195,34 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+<<<<<<< HEAD
   @@unique([provider, providerAccountId])
 }
 
 // NextAuth Session 모델
+=======
+  @@unique([provider, providerAccountId])  // 제공자+계정ID 조합 유니크
+  @@index([userId])
+}
+
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+<<<<<<< HEAD
 }
 
 // NextAuth VerificationToken 모델
+=======
+
+  @@index([userId])
+}
+
+// NextAuth 이메일 인증 토큰
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -124,6 +231,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+<<<<<<< HEAD
 // 거래 내역
 model Transaction {
   id          String            @id @default(cuid())
@@ -141,11 +249,53 @@ model Transaction {
   @@index([userId])
   @@index([type])
   @@index([status])
+=======
+// 포인트 거래 내역
+model Transaction {
+  id              String             @id @default(cuid())
+  userId          String
+  type            TransactionType
+  amount          Int
+  balance         Int                // 거래 후 잔액
+  status          TransactionStatus  @default(PENDING)
+  referenceCode   String?            @unique // 충전 시 참조 코드
+  description     String?
+  metadata        Json?              // 추가 정보 (카카오페이 정보 등)
+  processedBy     String?            // 처리한 관리자 ID
+  processedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user            User               @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([referenceCode])
+  @@index([createdAt])
+}
+
+// 포인트 변동 로그 (감사용)
+model PointLog {
+  id              String             @id @default(cuid())
+  userId          String
+  amount          Int                // 변동량 (+/-)
+  balanceBefore   Int
+  balanceAfter    Int
+  reason          String
+  transactionId   String?            // 관련 거래 ID
+  createdBy       String?            // 작업 수행자
+  createdAt       DateTime           @default(now())
+
+  user            User               @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
   @@index([createdAt])
 }
 
 // 바인권
 model Voucher {
+<<<<<<< HEAD
   id           String        @id @default(cuid())
   userId       String
   type         VoucherType
@@ -161,10 +311,43 @@ model Voucher {
 
   @@index([userId])
   @@index([status])
+=======
+  id              String             @id @default(cuid())
+  userId          String
+  type            VoucherType
+  status          VoucherStatus      @default(ACTIVE)
+  purchasePrice   Int                // 구매 가격
+  expiresAt       DateTime?          // 만료일
+  usedAt          DateTime?          // 사용일
+  tournamentId    String?            // 사용된 토너먼트
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user            User               @relation(fields: [userId], references: [id])
+  tournament      Tournament?        @relation(fields: [tournamentId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// 바인권 가격 설정
+model VoucherPricing {
+  id              String             @id @default(cuid())
+  type            VoucherType
+  regularPrice    Int                // 정회원 가격
+  guestPrice      Int                // 게스트 가격
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@unique([type, isActive])
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 }
 
 // 토너먼트
 model Tournament {
+<<<<<<< HEAD
   id        String    @id @default(cuid())
   title     String
   startDate DateTime
@@ -176,3 +359,50 @@ model Tournament {
 
   @@index([startDate])
 }
+=======
+  id              String             @id @default(cuid())
+  name            String
+  description     String?
+  startDate       DateTime
+  endDate         DateTime?
+  maxEntries      Int?               // 최대 참가자 수
+  buyinRequired   Int                @default(1) // 필요한 바인권 수
+  rebuyAllowed    Boolean            @default(true)
+  status          String             @default("UPCOMING") // UPCOMING, ACTIVE, COMPLETED, CANCELLED
+  createdBy       String
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  entries         TournamentEntry[]
+  vouchers        Voucher[]
+
+  @@index([status])
+  @@index([startDate])
+}
+
+// 토너먼트 참가
+model TournamentEntry {
+  id              String             @id @default(cuid())
+  tournamentId    String
+  userId          String
+  position        Int?               // 최종 순위
+  prize           Int?               // 상금
+  createdAt       DateTime           @default(now())
+
+  tournament      Tournament         @relation(fields: [tournamentId], references: [id])
+  user            User               @relation(fields: [userId], references: [id])
+
+  @@unique([tournamentId, userId])
+  @@index([userId])
+}
+
+// 시스템 설정
+model SystemSetting {
+  id              String             @id @default(cuid())
+  key             String             @unique
+  value           String
+  description     String?
+  updatedBy       String?
+  updatedAt       DateTime           @updatedAt
+}
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f

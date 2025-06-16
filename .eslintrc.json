@@ -1,6 +1,7 @@
 {
   "extends": [
     "next/core-web-vitals",
+<<<<<<< HEAD
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier"
@@ -80,4 +81,14 @@
       }
     }
   ]
+=======
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  }
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 }

@@ -33,7 +33,10 @@ import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { toast } from '@/components/ui/use-toast'
 import { Search, Filter, UserCog, Eye, Shield } from 'lucide-react'
+<<<<<<< HEAD
 import { MemberGrade } from '@/types/prisma'
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 
 // Mock 데이터
 const mockMembers = [
@@ -138,7 +141,11 @@ export default function AdminMembersPage() {
     }
 
     setMembers(prev => prev.map(member => 
+<<<<<<< HEAD
       member.id === memberId ? { ...member, grade: newGrade as MemberGrade } : member
+=======
+      member.id === memberId ? { ...member, grade: newGrade as any } : member
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     ))
 
     toast({

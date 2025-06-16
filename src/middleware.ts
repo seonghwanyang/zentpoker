@@ -11,7 +11,15 @@ const protectedRoutes = {
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
+<<<<<<< HEAD
   
+=======
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET 
+  })
+
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
   // 정적 파일이나 API 라우트는 미들웨어에서 제외
   if (
     path.startsWith('/_next') ||
@@ -21,6 +29,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+<<<<<<< HEAD
   // 토큰 가져오기 - secret 명시적으로 전달
   let token = null;
   try {
@@ -41,6 +50,12 @@ export async function middleware(request: NextRequest) {
     console.log('Token:', token)
     console.log('Is Authenticated:', isAuthenticated)
   }
+=======
+  // 로그인 여부 확인
+  const isAuthenticated = !!token
+  const userRole = token?.role as string | undefined
+  const userStatus = token?.status as string | undefined
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 
   // 인증 페이지 접근 제어 (로그인한 사용자는 접근 불가)
   if (protectedRoutes.auth.some(route => path.startsWith(route))) {
@@ -58,9 +73,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     }
 
+<<<<<<< HEAD
     // 토큰에서 사용자 정보 가져오기
     const userStatus = token.status as string | undefined
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     // 비활성 계정 차단
     if (userStatus === 'INACTIVE') {
       return NextResponse.redirect(new URL('/account-suspended', request.url))
@@ -78,7 +96,10 @@ export async function middleware(request: NextRequest) {
     }
 
     // 관리자 권한 확인
+<<<<<<< HEAD
     const userRole = token.role as string | undefined
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     if (userRole !== 'ADMIN') {
       return NextResponse.redirect(new URL('/unauthorized', request.url))
     }
@@ -103,9 +124,12 @@ export async function middleware(request: NextRequest) {
     }
 
     // 관리자 API 권한 확인
+<<<<<<< HEAD
     const userRole = token.role as string | undefined
     const userStatus = token.status as string | undefined
     
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     if (path.startsWith('/api/admin') && userRole !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Forbidden' },
@@ -135,4 +159,8 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f

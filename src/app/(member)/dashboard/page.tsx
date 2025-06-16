@@ -86,7 +86,11 @@ export default function DashboardPage() {
         </div>
 
         {/* 게스트 회원 알림 - 정회원 승급 안내 */}
+<<<<<<< HEAD
         {session.user.memberGrade === 'GUEST' && (
+=======
+        {session.user?.memberGrade === 'GUEST' && (
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
           <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="flex items-center gap-3 p-4">
               <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
@@ -110,9 +114,15 @@ export default function DashboardPage() {
         {/* 포인트 잔액 카드 */}
         <BalanceCard
           balance={mockData.balance}
+<<<<<<< HEAD
           memberGrade={session.user.memberGrade}
           userName={session.user.name || undefined}
           userImage={session.user.image || undefined}
+=======
+          memberGrade={session.user?.memberGrade || 'GUEST'}
+          userName={session.user?.name || undefined}
+          userImage={session.user?.image || undefined}
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
           recentChange={mockData.recentChange}
         />
 
@@ -240,8 +250,13 @@ export default function DashboardPage() {
                   <VoucherCard
                     key={voucher.id}
                     type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
+<<<<<<< HEAD
                     status="ACTIVE"
                     purchasePrice={100000}
+=======
+                    status={voucher.isUsed ? 'USED' : 'ACTIVE'}
+                    purchasePrice={voucher.type === 'BUY_IN' ? 250000 : 150000}
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
                     expiresAt={new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
                     onUse={() => console.log('Use voucher:', voucher.id)}
                   />

@@ -31,6 +31,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(ssr)/./node_modules/next/dist/api/navigation.js":
 /*!**************************************************!*\
   !*** ./node_modules/next/dist/api/navigation.js ***!
@@ -42,6 +43,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _cli
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(ssr)/./node_modules/next/dist/client/add-base-path.js":
 /*!********************************************************!*\
   !*** ./node_modules/next/dist/client/add-base-path.js ***!
@@ -2007,6 +2010,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/api/headers.js":
 /*!***********************************************!*\
   !*** ./node_modules/next/dist/api/headers.js ***!
@@ -2018,6 +2022,8 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _cli
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/api/link.js":
 /*!********************************************!*\
   !*** ./node_modules/next/dist/api/link.js ***!
@@ -2081,6 +2087,7 @@ module.exports = createProxy("C:\\Users\\user\\Desktop\\Business\\Zent_poker\\Ze
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/client/components/draft-mode.js":
 /*!****************************************************************!*\
   !*** ./node_modules/next/dist/client/components/draft-mode.js ***!
@@ -2092,6 +2099,8 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/client/components/error-boundary.js":
 /*!********************************************************************!*\
   !*** ./node_modules/next/dist/client/components/error-boundary.js ***!
@@ -2107,6 +2116,7 @@ module.exports = createProxy("C:\\Users\\user\\Desktop\\Business\\Zent_poker\\Ze
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/client/components/headers.js":
 /*!*************************************************************!*\
   !*** ./node_modules/next/dist/client/components/headers.js ***!
@@ -2118,6 +2128,8 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/client/components/hooks-server-context.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/next/dist/client/components/hooks-server-context.js ***!
@@ -2211,6 +2223,7 @@ module.exports = createProxy("C:\\Users\\user\\Desktop\\Business\\Zent_poker\\Ze
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/compiled/@edge-runtime/cookies/index.js":
 /*!************************************************************************!*\
   !*** ./node_modules/next/dist/compiled/@edge-runtime/cookies/index.js ***!
@@ -2222,6 +2235,8 @@ eval("\nvar __defProp = Object.defineProperty;\nvar __getOwnPropDesc = Object.ge
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/compiled/@opentelemetry/api/index.js":
 /*!*********************************************************************!*\
   !*** ./node_modules/next/dist/compiled/@opentelemetry/api/index.js ***!
@@ -2397,6 +2412,7 @@ eval("\nmodule.exports = __webpack_require__(/*! ../../module.compiled */ \"(ssr
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/server/future/route-modules/app-route/module.compiled.js":
 /*!*****************************************************************************************!*\
   !*** ./node_modules/next/dist/server/future/route-modules/app-route/module.compiled.js ***!
@@ -2408,6 +2424,8 @@ eval("\nif (false) {} else {\n    if (false) {} else {\n        if (true) {\n   
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/server/lib/clone-response.js":
 /*!*************************************************************!*\
   !*** ./node_modules/next/dist/server/lib/clone-response.js ***!
@@ -2463,6 +2481,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+<<<<<<< HEAD
 /***/ "(rsc)/./node_modules/next/dist/server/web/spec-extension/adapters/headers.js":
 /*!******************************************************************************!*\
   !*** ./node_modules/next/dist/server/web/spec-extension/adapters/headers.js ***!
@@ -2474,6 +2493,8 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 
 /***/ }),
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ "(rsc)/./node_modules/next/dist/server/web/spec-extension/adapters/reflect.js":
 /*!******************************************************************************!*\
   !*** ./node_modules/next/dist/server/web/spec-extension/adapters/reflect.js ***!
@@ -2483,6 +2504,7 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 "use strict";
 eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));\nObject.defineProperty(exports, \"ReflectAdapter\", ({\n    enumerable: true,\n    get: function() {\n        return ReflectAdapter;\n    }\n}));\nclass ReflectAdapter {\n    static get(target, prop, receiver) {\n        const value = Reflect.get(target, prop, receiver);\n        if (typeof value === \"function\") {\n            return value.bind(target);\n        }\n        return value;\n    }\n    static set(target, prop, value, receiver) {\n        return Reflect.set(target, prop, value, receiver);\n    }\n    static has(target, prop) {\n        return Reflect.has(target, prop);\n    }\n    static deleteProperty(target, prop) {\n        return Reflect.deleteProperty(target, prop);\n    }\n}\n\n//# sourceMappingURL=reflect.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L3NlcnZlci93ZWIvc3BlYy1leHRlbnNpb24vYWRhcHRlcnMvcmVmbGVjdC5qcyIsIm1hcHBpbmdzIjoiQUFBYTtBQUNiLDhDQUE2QztBQUM3QztBQUNBLENBQUMsRUFBQztBQUNGLGtEQUFpRDtBQUNqRDtBQUNBO0FBQ0E7QUFDQTtBQUNBLENBQUMsRUFBQztBQUNGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUFFQSIsInNvdXJjZXMiOlsid2VicGFjazovL3plbnRwb2tlci8uL25vZGVfbW9kdWxlcy9uZXh0L2Rpc3Qvc2VydmVyL3dlYi9zcGVjLWV4dGVuc2lvbi9hZGFwdGVycy9yZWZsZWN0LmpzP2M3N2IiXSwic291cmNlc0NvbnRlbnQiOlsiXCJ1c2Ugc3RyaWN0XCI7XG5PYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgXCJfX2VzTW9kdWxlXCIsIHtcbiAgICB2YWx1ZTogdHJ1ZVxufSk7XG5PYmplY3QuZGVmaW5lUHJvcGVydHkoZXhwb3J0cywgXCJSZWZsZWN0QWRhcHRlclwiLCB7XG4gICAgZW51bWVyYWJsZTogdHJ1ZSxcbiAgICBnZXQ6IGZ1bmN0aW9uKCkge1xuICAgICAgICByZXR1cm4gUmVmbGVjdEFkYXB0ZXI7XG4gICAgfVxufSk7XG5jbGFzcyBSZWZsZWN0QWRhcHRlciB7XG4gICAgc3RhdGljIGdldCh0YXJnZXQsIHByb3AsIHJlY2VpdmVyKSB7XG4gICAgICAgIGNvbnN0IHZhbHVlID0gUmVmbGVjdC5nZXQodGFyZ2V0LCBwcm9wLCByZWNlaXZlcik7XG4gICAgICAgIGlmICh0eXBlb2YgdmFsdWUgPT09IFwiZnVuY3Rpb25cIikge1xuICAgICAgICAgICAgcmV0dXJuIHZhbHVlLmJpbmQodGFyZ2V0KTtcbiAgICAgICAgfVxuICAgICAgICByZXR1cm4gdmFsdWU7XG4gICAgfVxuICAgIHN0YXRpYyBzZXQodGFyZ2V0LCBwcm9wLCB2YWx1ZSwgcmVjZWl2ZXIpIHtcbiAgICAgICAgcmV0dXJuIFJlZmxlY3Quc2V0KHRhcmdldCwgcHJvcCwgdmFsdWUsIHJlY2VpdmVyKTtcbiAgICB9XG4gICAgc3RhdGljIGhhcyh0YXJnZXQsIHByb3ApIHtcbiAgICAgICAgcmV0dXJuIFJlZmxlY3QuaGFzKHRhcmdldCwgcHJvcCk7XG4gICAgfVxuICAgIHN0YXRpYyBkZWxldGVQcm9wZXJ0eSh0YXJnZXQsIHByb3ApIHtcbiAgICAgICAgcmV0dXJuIFJlZmxlY3QuZGVsZXRlUHJvcGVydHkodGFyZ2V0LCBwcm9wKTtcbiAgICB9XG59XG5cbi8vIyBzb3VyY2VNYXBwaW5nVVJMPXJlZmxlY3QuanMubWFwIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/adapters/reflect.js\n");
 
+<<<<<<< HEAD
 /***/ }),
 
 /***/ "(rsc)/./node_modules/next/dist/server/web/spec-extension/adapters/request-cookies.js":
@@ -2505,6 +2527,8 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));
 "use strict";
 eval("\nObject.defineProperty(exports, \"__esModule\", ({\n    value: true\n}));\n0 && (0);\nfunction _export(target, all) {\n    for(var name in all)Object.defineProperty(target, name, {\n        enumerable: true,\n        get: all[name]\n    });\n}\n_export(exports, {\n    RequestCookies: function() {\n        return _cookies.RequestCookies;\n    },\n    ResponseCookies: function() {\n        return _cookies.ResponseCookies;\n    },\n    stringifyCookie: function() {\n        return _cookies.stringifyCookie;\n    }\n});\nconst _cookies = __webpack_require__(/*! next/dist/compiled/@edge-runtime/cookies */ \"(rsc)/./node_modules/next/dist/compiled/@edge-runtime/cookies/index.js\");\n\n//# sourceMappingURL=cookies.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L3NlcnZlci93ZWIvc3BlYy1leHRlbnNpb24vY29va2llcy5qcyIsIm1hcHBpbmdzIjoiQUFBYTtBQUNiLDhDQUE2QztBQUM3QztBQUNBLENBQUMsRUFBQztBQUNGLE1BQU0sQ0FJTDtBQUNEO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsS0FBSztBQUNMO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsS0FBSztBQUNMO0FBQ0E7QUFDQSxLQUFLO0FBQ0w7QUFDQTtBQUNBO0FBQ0EsQ0FBQztBQUNELGlCQUFpQixtQkFBTyxDQUFDLHdIQUEwQzs7QUFFbkUiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly96ZW50cG9rZXIvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L3NlcnZlci93ZWIvc3BlYy1leHRlbnNpb24vY29va2llcy5qcz9lNjU1Il0sInNvdXJjZXNDb250ZW50IjpbIlwidXNlIHN0cmljdFwiO1xuT2JqZWN0LmRlZmluZVByb3BlcnR5KGV4cG9ydHMsIFwiX19lc01vZHVsZVwiLCB7XG4gICAgdmFsdWU6IHRydWVcbn0pO1xuMCAmJiAobW9kdWxlLmV4cG9ydHMgPSB7XG4gICAgUmVxdWVzdENvb2tpZXM6IG51bGwsXG4gICAgUmVzcG9uc2VDb29raWVzOiBudWxsLFxuICAgIHN0cmluZ2lmeUNvb2tpZTogbnVsbFxufSk7XG5mdW5jdGlvbiBfZXhwb3J0KHRhcmdldCwgYWxsKSB7XG4gICAgZm9yKHZhciBuYW1lIGluIGFsbClPYmplY3QuZGVmaW5lUHJvcGVydHkodGFyZ2V0LCBuYW1lLCB7XG4gICAgICAgIGVudW1lcmFibGU6IHRydWUsXG4gICAgICAgIGdldDogYWxsW25hbWVdXG4gICAgfSk7XG59XG5fZXhwb3J0KGV4cG9ydHMsIHtcbiAgICBSZXF1ZXN0Q29va2llczogZnVuY3Rpb24oKSB7XG4gICAgICAgIHJldHVybiBfY29va2llcy5SZXF1ZXN0Q29va2llcztcbiAgICB9LFxuICAgIFJlc3BvbnNlQ29va2llczogZnVuY3Rpb24oKSB7XG4gICAgICAgIHJldHVybiBfY29va2llcy5SZXNwb25zZUNvb2tpZXM7XG4gICAgfSxcbiAgICBzdHJpbmdpZnlDb29raWU6IGZ1bmN0aW9uKCkge1xuICAgICAgICByZXR1cm4gX2Nvb2tpZXMuc3RyaW5naWZ5Q29va2llO1xuICAgIH1cbn0pO1xuY29uc3QgX2Nvb2tpZXMgPSByZXF1aXJlKFwibmV4dC9kaXN0L2NvbXBpbGVkL0BlZGdlLXJ1bnRpbWUvY29va2llc1wiKTtcblxuLy8jIHNvdXJjZU1hcHBpbmdVUkw9Y29va2llcy5qcy5tYXAiXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/dist/server/web/spec-extension/cookies.js\n");
 
+=======
+>>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /***/ })
 
 };

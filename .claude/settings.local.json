@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(grep:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npm install:*)",
+      "Bash(npm i:*)",
+      "Bash(npm run dev:*)",
+      "Bash(kill:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": []
+  }
+}
