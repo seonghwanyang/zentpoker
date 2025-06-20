@@ -88,15 +88,15 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-muted;  /* 스크롤바 트랙 배경색 */
+    @apply bg-muted;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/30 rounded-full;  /* 스크롤바 썸 스타일 */
+    @apply bg-muted-foreground/30 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;  /* 호버 시 스크롤바 썸 색상 */
+    @apply bg-muted-foreground/50;
   }
 
   /* Firefox 용 스크롤바 */

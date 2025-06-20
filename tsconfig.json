@@ -13,20 +13,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-<<<<<<< HEAD
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "removeComments": true,
-=======
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     "plugins": [
       {
         "name": "next"

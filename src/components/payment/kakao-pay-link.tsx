@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/lib/hooks/use-toast'
 import { Copy, ExternalLink, CheckCircle2 } from 'lucide-react'
-import Image from 'next/image'
 
 // 카카오페이 송금 링크 컴포넌트의 Props 타입 정의
 interface KakaoPayLinkProps {
   amount: number          // 충전 금액
   referenceCode: string   // 참조 코드 (입금 확인용)
-  kakaoPayLink?: string   // 카카오페이 송금 링크
+  memberGrade: 'GUEST' | 'REGULAR'  // 회원 등급
+  voucherType: 'BUYIN' | 'REBUY'    // 바인권 타입
   bankAccount?: string    // 계좌번호
   accountHolder?: string  // 예금주명
 }
@@ -22,12 +22,28 @@ interface KakaoPayLinkProps {
 export function KakaoPayLink({
   amount,
   referenceCode,
-  kakaoPayLink = process.env.NEXT_PUBLIC_KAKAO_PAY_LINK,
+  memberGrade,
+  voucherType,
   bankAccount = process.env.NEXT_PUBLIC_BANK_ACCOUNT,
   accountHolder = process.env.NEXT_PUBLIC_ACCOUNT_HOLDER,
 }: KakaoPayLinkProps) {
   // 현재 복사된 필드를 추적하는 상태 (체크 아이콘 표시용)
   const [copiedField, setCopiedField] = useState<string | null>(null)
+
+  // 등급과 타입에 따른 카카오페이 링크 결정
+  const getKakaoPayLink = () => {
+    if (memberGrade === 'GUEST') {
+      return voucherType === 'BUYIN' 
+        ? process.env.NEXT_PUBLIC_KAKAO_PAY_GUEST_BUYIN
+        : process.env.NEXT_PUBLIC_KAKAO_PAY_GUEST_REBUY
+    } else {
+      return voucherType === 'BUYIN'
+        ? process.env.NEXT_PUBLIC_KAKAO_PAY_REGULAR_BUYIN
+        : process.env.NEXT_PUBLIC_KAKAO_PAY_REGULAR_REBUY
+    }
+  }
+
+  const kakaoPayLink = getKakaoPayLink()
 
   // 금액을 한국 형식으로 포맷팅
   const formatAmount = (value: number) => {
@@ -56,13 +72,20 @@ export function KakaoPayLink({
     }
   }
 
+  // 등급과 타입에 따른 설명 문구
+  const getDescription = () => {
+    const gradeText = memberGrade === 'GUEST' ? '게스트' : '정회원'
+    const typeText = voucherType === 'BUYIN' ? 'Buy-in' : 'Re-buy'
+    return `${gradeText} ${typeText} 바인권 구매`
+  }
+
   return (
     <div className="space-y-4">
       {/* 충전 금액 정보 카드 */}
       <Card>
         <CardHeader>
-          <CardTitle>충전 금액</CardTitle>
-          <CardDescription>아래 금액을 송금해주세요</CardDescription>
+          <CardTitle>결제 금액</CardTitle>
+          <CardDescription>{getDescription()}</CardDescription>
         </CardHeader>
         <CardContent>
           {/* 충전 금액 표시 */}
@@ -82,6 +105,14 @@ export function KakaoPayLink({
                 <Copy className="h-4 w-4" />
               )}
             </Button>
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <Badge variant={memberGrade === 'GUEST' ? 'secondary' : 'default'}>
+              {memberGrade === 'GUEST' ? '게스트' : '정회원'}
+            </Badge>
+            <Badge variant="outline">
+              {voucherType === 'BUYIN' ? 'Buy-in' : 'Re-buy'}
+            </Badge>
           </div>
         </CardContent>
       </Card>
@@ -172,7 +203,7 @@ export function KakaoPayLink({
           <CardTitle className="text-base">송금 안내사항</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <p>• 송금 후 5-10분 내에 자동으로 포인트가 충전됩니다</p>
+          <p>• 관리자가 입금을 확인하면 포인트가 충전됩니다</p>
           <p>• 참조코드를 반드시 입력해주세요</p>
           <p>• 문제가 있으시면 관리자에게 문의해주세요</p>
         </CardContent>

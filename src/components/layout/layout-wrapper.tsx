@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Header } from './header';
 import { Footer } from './footer';
 import { MemberSidebar } from './member-sidebar';
-import { AdminSidebar } from './admin-sidebar';
+import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { cn } from '@/lib/utils';
 
 interface LayoutWrapperProps {
@@ -37,20 +37,26 @@ export function LayoutWrapper({
           isAdminPage ? <AdminSidebar /> : <MemberSidebar />
         )}
         
-        <main
-          className={cn(
-            'flex-1 p-6',
-            shouldShowSidebar ? 'md:ml-64' : '',
-            'transition-all duration-300'
+        <div className="flex-1 flex flex-col">
+          <main className={cn(
+            "flex-1 p-6 transition-all duration-300",
+            shouldShowSidebar && "lg:ml-64"
+          )}>
+            <div className="container mx-auto max-w-7xl">
+              {children}
+            </div>
+          </main>
+          
+          {showFooter && (
+            <div className={cn(
+              "transition-all duration-300",
+              shouldShowSidebar && "lg:pl-0" // Footer는 자체적으로 ml-64를 갖고 있음
+            )}>
+              <Footer />
+            </div>
           )}
-        >
-          <div className="container mx-auto max-w-7xl">
-            {children}
-          </div>
-        </main>
+        </div>
       </div>
-      
-      {showFooter && <Footer />}
     </div>
   );
 }

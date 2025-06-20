@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MemberBadge } from '@/components/member-badge'
+import { MemberBadge } from '@/components/members/member-badge'
 import {
   Select,
   SelectContent,
@@ -30,13 +30,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { toast } from '@/components/ui/use-toast'
 import { Search, Filter, UserCog, Eye, Shield } from 'lucide-react'
-<<<<<<< HEAD
-import { MemberGrade } from '@/types/prisma'
-=======
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 
 // Mock 데이터
 const mockMembers = [
@@ -141,11 +137,7 @@ export default function AdminMembersPage() {
     }
 
     setMembers(prev => prev.map(member => 
-<<<<<<< HEAD
-      member.id === memberId ? { ...member, grade: newGrade as MemberGrade } : member
-=======
       member.id === memberId ? { ...member, grade: newGrade as any } : member
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     ))
 
     toast({

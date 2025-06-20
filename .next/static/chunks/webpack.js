@@ -192,11 +192,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
-<<<<<<< HEAD
-/******/ 		__webpack_require__.h = function() { return "ecf37e6bd5b54902"; }
-=======
-/******/ 		__webpack_require__.h = function() { return "44ecace9f294e365"; }
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
+/******/ 		__webpack_require__.h = function() { return "04106f716ee292c2"; }
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
@@ -1406,14 +1402,11 @@
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	}();
 /******/ 	
-<<<<<<< HEAD
 /******/ 	/* webpack/runtime/nonce */
 /******/ 	!function() {
 /******/ 		__webpack_require__.nc = undefined;
 /******/ 	}();
 /******/ 	
-=======
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 /************************************************************************/
 /******/ 	
 /******/ 	// module cache are used so entry inlining is disabled

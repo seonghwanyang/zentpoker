@@ -9,19 +9,19 @@ export default function HomePage() {
       <nav className="flex items-center justify-between p-6 lg:px-8">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
-            <span className="text-2xl font-bold text-white">Zentpoker</span>
+            <span className="text-3xl font-bold text-white">Zentpoker</span>
           </Link>
         </div>
-        <div className="flex gap-x-6">
+        <div className="flex gap-x-4">
           <Link
             href="/login"
-            className="text-sm font-semibold leading-6 text-white hover:text-purple-200"
+            className="rounded-md bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-white/20 transition-all duration-200"
           >
             로그인
           </Link>
           <Link
             href="/register"
-            className="rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-purple-900 shadow-sm hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="rounded-md bg-white px-6 py-2.5 text-sm font-semibold text-purple-900 shadow-sm hover:bg-purple-50 transition-all duration-200 hover:scale-105"
           >
             시작하기
           </Link>

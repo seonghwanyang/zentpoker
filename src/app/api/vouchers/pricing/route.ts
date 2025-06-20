@@ -1,68 +1,55 @@
-import { NextResponse } from 'next/server'
-<<<<<<< HEAD
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/auth-options'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/auth-options';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 가격 설정 조회 (실제로는 DB에 가격 테이블이 있어야 함)
-    // 현재는 하드코딩된 값 사용
-    const pricing = {
-      buyIn: {
-        regular: 50000,
-        guest: 60000,
-      },
-      reBuy: {
-        regular: 30000,
-        guest: 36000,
-      },
-      guestPremium: 20, // 게스트 할증률 (%)
+    // 사용자 정보 조회
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { grade: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
-    return NextResponse.json({
-      success: true,
-      data: pricing,
-    })
-  } catch (error) {
-    console.error('Pricing fetch error:', error)
-=======
 
-// Mock 가격 데이터
-const mockPricing = {
-  buyIn: {
-    regular: 50000,
-    guest: 60000,
-  },
-  reBuy: {
-    regular: 30000,
-    guest: 36000,
-  },
-  guestPremium: 20, // 게스트 할증률 (%)
-}
+    // 활성화된 가격 정책 조회
+    const pricing = await prisma.voucherPricing.findMany({
+      where: { isActive: true },
+    });
 
-export async function GET() {
-  try {
-    // 실제로는 DB에서 현재 가격 정보 조회
-    
+    // 사용자 등급에 맞는 가격 찾기
+    const userPricing = pricing.filter(p => p.memberGrade === user.grade);
+    const regularPricing = pricing.filter(p => p.memberGrade === 'REGULAR');
+
+    const buyInPrice = userPricing.find(p => p.type === 'BUYIN')?.price || 0;
+    const rebuyPrice = userPricing.find(p => p.type === 'REBUY')?.price || 0;
+    const regularBuyInPrice = regularPricing.find(p => p.type === 'BUYIN')?.price || 0;
+    const regularRebuyPrice = regularPricing.find(p => p.type === 'REBUY')?.price || 0;
+
     return NextResponse.json({
-      success: true,
-      data: mockPricing,
-    })
+      userGrade: user.grade,
+      prices: {
+        buyIn: buyInPrice,
+        rebuy: rebuyPrice,
+      },
+      regularPrices: {
+        buyIn: regularBuyInPrice,
+        rebuy: regularRebuyPrice,
+      },
+      discountRate: user.grade === 'REGULAR' ? 
+        Math.round((1 - buyInPrice / (regularBuyInPrice * 1.2)) * 100) : 0,
+    });
   } catch (error) {
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch pricing' },
-      { status: 500 }
-    )
+    console.error('Error fetching pricing:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

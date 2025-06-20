@@ -4,10 +4,6 @@ import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-<<<<<<< HEAD
-import { ChartTooltipProps } from '@/types/prisma'
-=======
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 import {
   Select,
   SelectContent,
@@ -66,8 +62,8 @@ const mockVoucherDistribution = [
 ]
 
 const mockMonthlyStats = {
-  totalRevenue: 15420000,
-  revenueGrowth: 23.5,
+  totalDeposit: 15420000,
+  depositGrowth: 23.5,
   totalMembers: 156,
   memberGrowth: 12.8,
   totalTransactions: 423,
@@ -86,20 +82,12 @@ export default function AdminReportsPage() {
   }
 
   // 커스텀 툴팁
-<<<<<<< HEAD
-  const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
-=======
   const CustomTooltip = ({ active, payload, label }: any) => {
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border rounded-lg shadow-lg p-3">
           <p className="text-sm font-medium">{label}</p>
-<<<<<<< HEAD
-          {payload.map((entry, index) => (
-=======
           {payload.map((entry: any, index: number) => (
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
             <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {entry.value.toLocaleString()}
               {entry.name === 'revenue' ? '원' : '건'}
@@ -147,14 +135,14 @@ export default function AdminReportsPage() {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">총 수익</p>
+              <p className="text-sm text-muted-foreground">총 입금액</p>
               <p className="text-2xl font-bold">
-                {mockMonthlyStats.totalRevenue.toLocaleString()}원
+                {mockMonthlyStats.totalDeposit.toLocaleString()}원
               </p>
               <div className="flex items-center gap-1 mt-2">
                 <TrendingUp className="h-4 w-4 text-green-500" />
                 <span className="text-sm text-green-500">
-                  +{mockMonthlyStats.revenueGrowth}%
+                  +{mockMonthlyStats.depositGrowth}%
                 </span>
               </div>
             </div>

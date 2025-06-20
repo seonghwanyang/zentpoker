@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -9,10 +10,8 @@ import {
   Ticket,
   Trophy,
   User,
-  ChevronLeft,
-  ChevronRight,
+  LogOut,
 } from 'lucide-react';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface SidebarItem {
@@ -51,34 +50,12 @@ const memberMenuItems: SidebarItem[] = [
 
 export function MemberSidebar() {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <aside
-      className={cn(
-        'fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] glass border-r border-purple-200/20 transition-all duration-300',
-        isCollapsed ? 'w-16' : 'w-64'
-      )}
-    >
+    <aside className="fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-64 glass border-r border-purple-200/20">
       <div className="flex h-full flex-col">
-        {/* Collapse Toggle */}
-        <div className="flex justify-end p-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hover:bg-purple-100/50"
-          >
-            {isCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-2 pb-4">
+        <nav className="flex-1 space-y-1 px-2 py-4">
           {memberMenuItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             
@@ -90,31 +67,37 @@ export function MemberSidebar() {
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all',
                   isActive
                     ? 'bg-purple-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-purple-100/50 hover:text-purple-600',
-                  isCollapsed && 'justify-center'
+                    : 'text-gray-700 hover:bg-purple-100/50 hover:text-purple-600'
                 )}
-                title={isCollapsed ? item.title : undefined}
               >
                 {item.icon}
-                {!isCollapsed && <span>{item.title}</span>}
+                <span>{item.title}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom Section */}
-        {!isCollapsed && (
-          <div className="border-t border-purple-200/20 p-4">
-            <div className="rounded-lg bg-purple-100/50 p-3">
-              <p className="text-xs text-purple-700">
-                <strong>도움이 필요하신가요?</strong>
-              </p>
-              <p className="text-xs text-purple-600 mt-1">
-                관리자에게 문의하세요
-              </p>
-            </div>
+        <div className="border-t border-purple-200/20 p-4 space-y-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={() => signOut({ callbackUrl: '/' })}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            로그아웃
+          </Button>
+          
+          <div className="rounded-lg bg-purple-100/50 p-3">
+            <p className="text-xs text-purple-700">
+              <strong>도움이 필요하신가요?</strong>
+            </p>
+            <p className="text-xs text-purple-600 mt-1">
+              관리자에게 문의하세요
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </aside>
   );
