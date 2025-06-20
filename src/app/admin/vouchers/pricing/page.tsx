@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { toast } from '@/components/ui/use-toast'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { 
   DollarSign, 
   Percent, 

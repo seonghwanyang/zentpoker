@@ -1,178 +1,109 @@
-<<<<<<< HEAD
-import { prisma } from '@/lib/prisma'
-import { UserWhereInput } from '@/types/prisma'
-import {
-  requireAdmin,
-  withErrorHandling,
-  createSuccessResponse,
-  parseSearchParams,
-} from '@/lib/api/middleware'
-
-export const GET = withErrorHandling(async (request: Request) => {
-  await requireAdmin()
-  
-  const { search, status, page, limit, skip, sortBy, sortOrder } = parseSearchParams(request)
-  const { searchParams } = new URL(request.url)
-  const grade = searchParams.get('grade') || 'ALL'
-
-  // 필터 조건 생성
-  const where: UserWhereInput = {}
-  
-  if (search) {
-    where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-      { phone: { contains: search, mode: 'insensitive' } }
-    ]
-  }
-  
-  if (grade !== 'ALL') {
-    where.tier = grade
-  }
-  
-  if (status && status !== 'ALL') {
-    where.status = status
-  }
-
-  // 전체 회원 수 조회
-  const total = await prisma.user.count({ where })
-
-  // 회원 목록 조회
-  const members = await prisma.user.findMany({
-    where,
-    orderBy: { [sortBy]: sortOrder },
-    skip,
-    take: limit,
-    include: {
-      transactions: {
-        select: {
-          amount: true,
-          type: true,
-          status: true
-        }
-      }
-    }
-  })
-
-  // 회원 데이터 포맷팅
-  const formattedMembers = members.map(member => {
-    const deposits = member.transactions
-      .filter(t => t.type === 'CHARGE' && t.status === 'COMPLETED')
-      .reduce((sum, t) => sum + t.amount, 0)
-    
-    const used = member.transactions
-      .filter(t => t.type === 'VOUCHER_PURCHASE' && t.status === 'COMPLETED')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
-
-    return {
-      id: member.id,
-      name: member.name || '미입력',
-      email: member.email || '',
-      phone: member.phone || '미입력',
-      grade: member.tier,
-      status: member.status,
-      points: member.points,
-      joinedAt: member.createdAt.toISOString().split('T')[0],
-      lastLogin: member.lastLoginAt ? member.lastLoginAt.toISOString() : null,
-      totalDeposit: deposits,
-      totalUsed: used,
-    }
-  })
-
-  return createSuccessResponse({
-    members: formattedMembers,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  })
-})
-=======
-import { NextResponse } from 'next/server'
-
-// Mock 회원 목록 데이터
-const mockMembers = [
-  {
-    id: '1',
-    name: '김철수',
-    email: 'kim@example.com',
-    phone: '010-1234-5678',
-    grade: 'REGULAR',
-    status: 'ACTIVE',
-    points: 150000,
-    joinedAt: '2024-01-15',
-    lastLogin: '2024-12-20T10:30:00',
-    totalDeposit: 500000,
-    totalUsed: 350000,
-  },
-  {
-    id: '2',
-    name: '이영희',
-    email: 'lee@example.com',
-    phone: '010-2345-6789',
-    grade: 'GUEST',
-    status: 'ACTIVE',
-    points: 50000,
-    joinedAt: '2024-03-20',
-    lastLogin: '2024-12-19T15:45:00',
-    totalDeposit: 100000,
-    totalUsed: 50000,
-  },
-  {
-    id: '3',
-    name: '박민수',
-    email: 'park@example.com',
-    phone: '010-3456-7890',
-    grade: 'REGULAR',
-    status: 'INACTIVE',
-    points: 0,
-    joinedAt: '2024-02-10',
-    lastLogin: '2024-11-30T20:00:00',
-    totalDeposit: 300000,
-    totalUsed: 300000,
-  },
-]
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/auth-options';
+import { prisma } from '@/lib/prisma';
+import { Role } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search') || ''
-    const grade = searchParams.get('grade') || 'ALL'
-    const status = searchParams.get('status') || 'ALL'
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    // 필터링
-    let filtered = mockMembers
+    // 관리자 권한 확인
+    const admin = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true },
+    });
+
+    if (!admin || admin.role !== Role.ADMIN) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search');
+    const grade = searchParams.get('grade');
+    const status = searchParams.get('status');
+
+    // 검색 조건 구성
+    const where: any = {};
     
     if (search) {
-      filtered = filtered.filter(member => 
-        member.name.includes(search) ||
-        member.email.includes(search) ||
-        member.phone.includes(search)
-      )
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } },
+        { phone: { contains: search } },
+      ];
     }
     
-    if (grade !== 'ALL') {
-      filtered = filtered.filter(member => member.grade === grade)
-    }
-    
-    if (status !== 'ALL') {
-      filtered = filtered.filter(member => member.status === status)
-    }
+    if (grade) where.grade = grade;
+    if (status) where.status = status;
+
+    // 전체 회원 수
+    const total = await prisma.user.count({ where });
+
+    // 회원 목록 조회
+    const members = await prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        grade: true,
+        status: true,
+        points: true,
+        createdAt: true,
+        lastLoginAt: true,
+        _count: {
+          select: {
+            transactions: true,
+            vouchers: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    // 통계 정보
+    const stats = await prisma.user.groupBy({
+      by: ['grade'],
+      _count: true,
+    });
+
+    const gradeStats = {
+      GUEST: 0,
+      REGULAR: 0,
+      ADMIN: 0,
+    };
+
+    stats.forEach((stat) => {
+      gradeStats[stat.grade] = stat._count;
+    });
 
     return NextResponse.json({
-      success: true,
-      data: {
-        members: filtered,
-        total: filtered.length,
+      members: members.map((member) => ({
+        ...member,
+        transactionCount: member._count.transactions,
+        voucherCount: member._count.vouchers,
+      })),
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    })
+      stats: gradeStats,
+    });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch members' },
-      { status: 500 }
-    )
+    console.error('Error fetching members:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f

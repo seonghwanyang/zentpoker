@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { toast } from '@/components/ui/use-toast'
 import { 
   Clock, 

@@ -2,17 +2,13 @@
 
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { LayoutWrapper } from '@/components/layout'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-<<<<<<< HEAD
 import { VoucherCard } from '@/components/vouchers/voucher-card'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
-=======
-import { VoucherCard } from '@/components/voucher-card'
-import { ConfirmDialog } from '@/components/confirm-dialog'
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 import { toast } from '@/components/ui/use-toast'
 import { 
   Calendar, 
@@ -149,9 +145,10 @@ export default function TournamentDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="flex items-start justify-between">
+    <LayoutWrapper>
+      <div className="space-y-6">
+        {/* 헤더 */}
+        <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">{mockTournament.name}</h1>
@@ -261,16 +258,12 @@ export default function TournamentDetailPage() {
                       }`}
                       onClick={() => setSelectedVoucher(voucher.id)}
                     >
-<<<<<<< HEAD
                       <VoucherCard 
                         type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
                         status={voucher.status}
                         purchasePrice={voucher.price}
                         expiresAt={new Date(voucher.expiresAt)}
                       />
-=======
-                      <VoucherCard voucher={voucher} />
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
                       {selectedVoucher === voucher.id && (
                         <div className="absolute top-2 right-2">
                           <CheckCircle className="h-6 w-6 text-green-500" />
@@ -425,5 +418,6 @@ export default function TournamentDetailPage() {
         isLoading={isRegistering}
       />
     </div>
+  </LayoutWrapper>
   )
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 z-50 w-full glass border-b border-purple-200/20">
-      <div className="container mx-auto px-4">
+      <div className="px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
@@ -46,7 +46,7 @@ export function Header() {
                 <Link href="/vouchers" className="text-sm font-medium hover:text-purple-600 transition-colors">
                   바인권
                 </Link>
-                {session.user.role === 'ADMIN' && (
+                {(session.user.role === 'ADMIN' || session.user.memberGrade === 'ADMIN') && (
                   <Link href="/admin/dashboard" className="text-sm font-medium hover:text-purple-600 transition-colors">
                     관리자
                   </Link>
@@ -74,7 +74,7 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     className="text-purple-600 hover:text-purple-700"
-                    onClick={() => signOut()}
+                    onClick={() => signOut({ callbackUrl: '/' })}
                   >
                     <LogOut className="h-4 w-4" />
                   </Button>
@@ -133,7 +133,7 @@ export function Header() {
                   >
                     바인권
                   </Link>
-                  {session.user.role === 'ADMIN' && (
+                  {(session.user.role === 'ADMIN' || session.user.memberGrade === 'ADMIN') && (
                     <Link
                       href="/admin/dashboard"
                       className="text-sm font-medium hover:text-purple-600 transition-colors"
@@ -153,7 +153,7 @@ export function Header() {
                     className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors text-left"
                     onClick={() => {
                       setIsMenuOpen(false);
-                      signOut();
+                      signOut({ callbackUrl: '/' });
                     }}
                   >
                     로그아웃
@@ -183,11 +183,4 @@ export function Header() {
       </div>
     </header>
   );
-}
-
-// signOut 함수 임시 구현 (NextAuth 설정 전)
-function signOut() {
-  // TODO: NextAuth 설정 후 실제 구현으로 변경 필요
-  // 실제로는 import { signOut } from 'next-auth/react' 사용
-  console.log('로그아웃');
 }

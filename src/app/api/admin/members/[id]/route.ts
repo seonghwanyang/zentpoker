@@ -1,109 +1,112 @@
-<<<<<<< HEAD
-import { prisma } from '@/lib/prisma'
-import { UserUpdateData } from '@/types/prisma'
-import {
-  requireAdmin,
-  withErrorHandling,
-  createSuccessResponse,
-  parseAndValidateBody,
-} from '@/lib/api/middleware'
-import { z } from 'zod'
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/auth-options';
+import { prisma } from '@/lib/prisma';
+import { Role, MemberGrade, UserStatus } from '@prisma/client';
 
-// 회원 정보 업데이트 검증 스키마
-const memberUpdateSchema = z.object({
-  grade: z.enum(['GUEST', 'REGULAR'], {
-    errorMap: () => ({ message: '올바른 회원 등급이 아닙니다.' }),
-  }).optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED'], {
-    errorMap: () => ({ message: '올바른 상태가 아닙니다.' }),
-  }).optional(),
-})
-
-export const PATCH = withErrorHandling(async (
+export async function GET(
   request: Request,
   { params }: { params: { id: string } }
-) => {
-  await requireAdmin()
-  
-  // 요청 데이터 검증
-  const { grade, status } = await parseAndValidateBody(request, (data) =>
-    memberUpdateSchema.parse(data)
-  )
-
-  // 업데이트할 데이터 준비
-  const updateData: UserUpdateData = {}
-  if (grade) updateData.tier = grade
-  if (status) updateData.status = status
-
-  // 회원 정보 업데이트
-  const updatedMember = await prisma.user.update({
-    where: { id: params.id },
-    data: updateData,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      tier: true,
-      status: true,
-      updatedAt: true
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-  })
 
-  return createSuccessResponse({
-    id: updatedMember.id,
-    name: updatedMember.name,
-    email: updatedMember.email,
-    grade: updatedMember.tier,
-    status: updatedMember.status,
-    updatedAt: updatedMember.updatedAt.toISOString(),
-  }, '회원 정보가 업데이트되었습니다.')
-})
-=======
-import { NextResponse } from 'next/server'
+    // 관리자 권한 확인
+    const admin = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true },
+    });
+
+    if (!admin || admin.role !== Role.ADMIN) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const member = await prisma.user.findUnique({
+      where: { id: params.id },
+      include: {
+        transactions: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+        vouchers: {
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+        _count: {
+          select: {
+            transactions: true,
+            vouchers: true,
+          },
+        },
+      },
+    });
+
+    if (!member) {
+      return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(member);
+  } catch (error) {
+    console.error('Error fetching member:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json()
-    const { grade, status } = body
-
-    // 유효성 검사
-    if (grade && !['GUEST', 'REGULAR', 'ADMIN'].includes(grade)) {
-      return NextResponse.json(
-        { success: false, error: '올바른 회원 등급이 아닙니다.' },
-        { status: 400 }
-      )
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (status && !['ACTIVE', 'INACTIVE'].includes(status)) {
-      return NextResponse.json(
-        { success: false, error: '올바른 상태가 아닙니다.' },
-        { status: 400 }
-      )
+    // 관리자 권한 확인
+    const admin = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { role: true },
+    });
+
+    if (!admin || admin.role !== Role.ADMIN) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // 실제로는 DB 업데이트
-    // const updatedMember = await prisma.user.update({
-    //   where: { id: params.id },
-    //   data: { grade, status }
-    // })
+    const body = await request.json();
+    const { name, phone, grade, status, role } = body;
 
-    return NextResponse.json({
-      success: true,
+    // 입력값 검증
+    if (grade && !Object.values(MemberGrade).includes(grade)) {
+      return NextResponse.json({ error: 'Invalid grade' }, { status: 400 });
+    }
+
+    if (status && !Object.values(UserStatus).includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+    }
+
+    if (role && !Object.values(Role).includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+    }
+
+    const updatedMember = await prisma.user.update({
+      where: { id: params.id },
       data: {
-        id: params.id,
-        grade: grade || 'REGULAR',
-        status: status || 'ACTIVE',
-        updatedAt: new Date().toISOString(),
+        ...(name && { name }),
+        ...(phone && { phone }),
+        ...(grade && { grade }),
+        ...(status && { status }),
+        ...(role && { role }),
       },
-    })
+    });
+
+    return NextResponse.json(updatedMember);
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to update member' },
-      { status: 500 }
-    )
+    console.error('Error updating member:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f

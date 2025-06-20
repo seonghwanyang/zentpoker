@@ -242,25 +242,27 @@ export default function VouchersPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredVouchers.map((voucher) => (
-                      <VoucherCard
-                        key={voucher.id}
-<<<<<<< HEAD
-                        type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
-                        status={voucher.isUsed ? 'USED' : (voucher.expiresAt < now ? 'EXPIRED' : 'ACTIVE')}
-                        purchasePrice={100000}
-                        expiresAt={voucher.expiresAt}
-                        usedAt={voucher.usedAt || undefined}
-                        onUse={voucher.isUsed || voucher.expiresAt < now ? undefined : () => {
-=======
-                        voucher={voucher}
-                        onUse={() => {
-                          // 실제로는 토너먼트 참가 페이지로 이동
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
-                          console.log('Use voucher:', voucher.id);
-                        }}
-                      />
-                    ))}
+                    {filteredVouchers.map((voucher) => {
+                      // 회원 등급에 따른 가격 설정
+                      const memberGrade = session.user?.memberGrade || 'GUEST';
+                      const price = voucher.type === 'BUY_IN' 
+                        ? (memberGrade === 'GUEST' ? 30000 : 25000)  // 관리자와 정회원은 동일한 가격
+                        : (memberGrade === 'GUEST' ? 20000 : 15000); // 관리자와 정회원은 동일한 가격
+                      
+                      return (
+                        <VoucherCard
+                          key={voucher.id}
+                          type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
+                          status={voucher.isUsed ? 'USED' : (voucher.expiresAt < now ? 'EXPIRED' : 'ACTIVE')}
+                          purchasePrice={price}
+                          expiresAt={voucher.expiresAt}
+                          usedAt={voucher.usedAt || undefined}
+                          onUse={voucher.isUsed || voucher.expiresAt < now ? undefined : () => {
+                            console.log('Use voucher:', voucher.id);
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>

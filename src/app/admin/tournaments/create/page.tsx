@@ -18,34 +18,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from '@/components/ui/use-toast'
+import { useTournamentStore } from '@/stores/tournament-store'
 import { CalendarIcon, Save, Trophy } from 'lucide-react'
-<<<<<<< HEAD
-import { TournamentType } from '@/types/prisma'
-=======
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
 
 // 폼 스키마
 const tournamentSchema = z.object({
   name: z.string().min(2, '토너먼트 이름은 2자 이상이어야 합니다'),
-  description: z.string().min(10, '설명은 10자 이상이어야 합니다'),
   longDescription: z.string().optional(),
-  type: z.enum(['REGULAR', 'SPECIAL', 'TURBO']),
   startDate: z.string().min(1, '시작 날짜를 선택해주세요'),
   startTime: z.string().min(1, '시작 시간을 선택해주세요'),
-  location: z.string().min(2, '장소를 입력해주세요'),
-  buyIn: z.string().transform((val) => parseInt(val)).refine((val) => val >= 10000, {
-    message: '바이인은 10,000원 이상이어야 합니다',
-  }),
-  guaranteedPrize: z.string().transform((val) => parseInt(val)).optional(),
-  maxPlayers: z.string().transform((val) => parseInt(val)).refine((val) => val >= 2, {
-    message: '최대 참가자는 2명 이상이어야 합니다',
-  }),
-  startingStack: z.string().transform((val) => parseInt(val)).refine((val) => val >= 1000, {
-    message: '시작 스택은 1,000 이상이어야 합니다',
-  }),
-  blindLevels: z.string().transform((val) => parseInt(val)).refine((val) => val >= 5, {
-    message: '블라인드 레벨은 5분 이상이어야 합니다',
-  }),
   lateRegistration: z.string().transform((val) => parseInt(val)),
   reEntry: z.boolean(),
   maxReEntries: z.string().transform((val) => parseInt(val)).optional(),
@@ -55,6 +36,7 @@ type TournamentFormData = z.infer<typeof tournamentSchema>
 
 export default function CreateTournamentPage() {
   const router = useRouter()
+  const addTournament = useTournamentStore((state) => state.addTournament)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [allowReEntry, setAllowReEntry] = useState(false)
 
@@ -67,11 +49,6 @@ export default function CreateTournamentPage() {
   } = useForm<TournamentFormData>({
     resolver: zodResolver(tournamentSchema),
     defaultValues: {
-      type: 'REGULAR',
-      buyIn: '50000',
-      maxPlayers: '50',
-      startingStack: '30000',
-      blindLevels: '20',
       lateRegistration: '4',
       reEntry: false,
       maxReEntries: '2',
@@ -82,8 +59,25 @@ export default function CreateTournamentPage() {
     setIsSubmitting(true)
 
     try {
+      // 토너먼트 데이터 생성
+      const newTournament = {
+        id: Date.now().toString(),
+        name: data.name,
+        type: 'REGULAR',
+        startDate: `${data.startDate}T${data.startTime}:00`,
+        location: '온라인',
+        buyIn: 50000,
+        guaranteedPrize: 0,
+        maxPlayers: 50,
+        currentPlayers: 0,
+        status: 'UPCOMING' as const,
+      }
+
+      // 스토어에 추가
+      addTournament(newTournament)
+
       // API 호출 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       toast({
         title: '토너먼트 생성 완료',
@@ -120,50 +114,15 @@ export default function CreateTournamentPage() {
           <h2 className="text-xl font-semibold mb-4">기본 정보</h2>
           
           <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">토너먼트 이름 *</Label>
-                <Input
-                  id="name"
-                  {...register('name')}
-                  placeholder="예: 주말 홀덤 토너먼트"
-                />
-                {errors.name && (
-                  <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="type">토너먼트 유형 *</Label>
-                <Select
-                  defaultValue="REGULAR"
-<<<<<<< HEAD
-                  onValueChange={(value) => setValue('type', value as TournamentType)}
-=======
-                  onValueChange={(value) => setValue('type', value as any)}
->>>>>>> c33190324b65e7aec4664e939445b400404c1b3f
-                >
-                  <SelectTrigger id="type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="REGULAR">일반</SelectItem>
-                    <SelectItem value="SPECIAL">스페셜</SelectItem>
-                    <SelectItem value="TURBO">터보</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="description">간단한 설명 *</Label>
+              <Label htmlFor="name">토너먼트 이름 *</Label>
               <Input
-                id="description"
-                {...register('description')}
-                placeholder="토너먼트에 대한 간단한 설명"
+                id="name"
+                {...register('name')}
+                placeholder="예: 주말 홀덤 토너먼트"
               />
-              {errors.description && (
-                <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
               )}
             </div>
 
@@ -179,12 +138,12 @@ export default function CreateTournamentPage() {
           </div>
         </Card>
 
-        {/* 일정 및 장소 */}
+        {/* 일정 */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">일정 및 장소</h2>
+          <h2 className="text-xl font-semibold mb-4">일정</h2>
           
           <div className="grid gap-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="startDate">시작 날짜 *</Label>
                 <Input
@@ -209,103 +168,17 @@ export default function CreateTournamentPage() {
                   <p className="text-sm text-destructive mt-1">{errors.startTime.message}</p>
                 )}
               </div>
-              
-              <div>
-                <Label htmlFor="location">장소 *</Label>
-                <Input
-                  id="location"
-                  {...register('location')}
-                  placeholder="예: 강남 홀덤 라운지"
-                />
-                {errors.location && (
-                  <p className="text-sm text-destructive mt-1">{errors.location.message}</p>
-                )}
-              </div>
             </div>
           </div>
         </Card>
 
-        {/* 참가 설정 */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">참가 설정</h2>
-          
-          <div className="grid gap-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="buyIn">바이인 (원) *</Label>
-                <Input
-                  id="buyIn"
-                  type="number"
-                  {...register('buyIn')}
-                  placeholder="50000"
-                  step="1000"
-                />
-                {errors.buyIn && (
-                  <p className="text-sm text-destructive mt-1">{errors.buyIn.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="guaranteedPrize">보장 상금 (원)</Label>
-                <Input
-                  id="guaranteedPrize"
-                  type="number"
-                  {...register('guaranteedPrize')}
-                  placeholder="1000000"
-                  step="10000"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="maxPlayers">최대 참가자 수 *</Label>
-                <Input
-                  id="maxPlayers"
-                  type="number"
-                  {...register('maxPlayers')}
-                  placeholder="50"
-                />
-                {errors.maxPlayers && (
-                  <p className="text-sm text-destructive mt-1">{errors.maxPlayers.message}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </Card>
+
 
         {/* 게임 구조 */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">게임 구조</h2>
           
           <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="startingStack">시작 스택 *</Label>
-                <Input
-                  id="startingStack"
-                  type="number"
-                  {...register('startingStack')}
-                  placeholder="30000"
-                  step="1000"
-                />
-                {errors.startingStack && (
-                  <p className="text-sm text-destructive mt-1">{errors.startingStack.message}</p>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="blindLevels">블라인드 레벨 (분) *</Label>
-                <Input
-                  id="blindLevels"
-                  type="number"
-                  {...register('blindLevels')}
-                  placeholder="20"
-                />
-                {errors.blindLevels && (
-                  <p className="text-sm text-destructive mt-1">{errors.blindLevels.message}</p>
-                )}
-              </div>
-            </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="lateRegistration">레이트 등록 (레벨)</Label>
