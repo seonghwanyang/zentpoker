@@ -1,0 +1,341 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: zentpoker_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [
+          "Desktop Chrome",
+          "Desktop Firefox", 
+          "Mobile Chrome"
+        ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps ${{ matrix.project == 'Desktop Chrome' && 'chromium' || matrix.project == 'Desktop Firefox' && 'firefox' || 'chromium' }}
+
+    - name: Setup test environment
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+      run: |
+        cp .env.local.template .env.test
+        echo "DATABASE_URL=$DATABASE_URL" >> .env.test
+        echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.test
+        echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.test
+        echo "NODE_ENV=test" >> .env.test
+
+    - name: Setup test database
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+      run: |
+        npm run db:test:setup
+
+    - name: Build application
+      run: npm run build
+
+    - name: Run E2E tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+        CI: true
+        E2E_CLEANUP_DB: true
+      run: npx playwright test --project="${{ matrix.project }}"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-results-${{ matrix.project }}
+        path: |
+          test-results/
+          playwright-report/
+        retention-days: 30
+
+  # Separate job for performance and accessibility tests (run only on Chrome)
+  performance-a11y-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: zentpoker_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps chromium
+
+    - name: Setup test environment
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+      run: |
+        cp .env.local.template .env.test
+        echo "DATABASE_URL=$DATABASE_URL" >> .env.test
+        echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.test
+        echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.test
+        echo "NODE_ENV=test" >> .env.test
+
+    - name: Setup test database
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+      run: |
+        npm run db:test:setup
+
+    - name: Build application
+      run: npm run build
+
+    - name: Run Performance Tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+        CI: true
+      run: npm run test:e2e:performance
+
+    - name: Run Accessibility Tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+        CI: true
+      run: npm run test:e2e:a11y
+
+    - name: Upload performance and a11y results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-a11y-results
+        path: |
+          test-results/
+          playwright-report/
+        retention-days: 30
+
+  # Merge reports from all test jobs
+  merge-reports:
+    if: always()
+    needs: [e2e-tests, performance-a11y-tests]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        path: all-artifacts
+
+    - name: Merge HTML Reports
+      run: |
+        # Create a merged report directory
+        mkdir -p merged-report
+        
+        # Copy all HTML reports to merged directory
+        find all-artifacts -name "playwright-report" -exec cp -r {}/* merged-report/ \; 2>/dev/null || true
+        
+        # Generate combined report if reports exist
+        if [ "$(ls -A merged-report)" ]; then
+          echo "Merged HTML reports available"
+        else
+          echo "No HTML reports to merge"
+        fi
+
+    - name: Upload merged report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: merged-playwright-report
+        path: merged-report/
+        retention-days: 30
+
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Look for test result files
+          const resultFiles = [];
+          
+          try {
+            const findResultFiles = (dir) => {
+              const files = fs.readdirSync(dir, { withFileTypes: true });
+              for (const file of files) {
+                const fullPath = path.join(dir, file.name);
+                if (file.isDirectory()) {
+                  findResultFiles(fullPath);
+                } else if (file.name.includes('results') && file.name.endsWith('.json')) {
+                  resultFiles.push(fullPath);
+                }
+              }
+            };
+            
+            findResultFiles('all-artifacts');
+            
+            let summary = '## 🎭 E2E Test Results\n\n';
+            
+            if (resultFiles.length === 0) {
+              summary += '❌ No test result files found\n';
+            } else {
+              summary += `✅ E2E tests completed across multiple browsers and devices\n`;
+              summary += `📊 Test artifacts available for download\n`;
+              summary += `🔗 [View detailed HTML report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+            }
+            
+            // Add performance note
+            summary += '\n### Performance & Accessibility\n';
+            summary += '⚡ Performance tests validate Core Web Vitals\n';
+            summary += '♿ Accessibility tests ensure WCAG compliance\n';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+          } catch (error) {
+            console.log('Error creating PR comment:', error.message);
+          }
+
+# Optional: Lighthouse CI for additional performance insights
+  lighthouse:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: zentpoker_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup test environment
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+        NODE_ENV: test
+      run: |
+        cp .env.local.template .env.test
+        echo "DATABASE_URL=$DATABASE_URL" >> .env.test
+        echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.test
+        echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.test
+
+    - name: Setup test database
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+      run: npm run db:test:setup
+
+    - name: Build and start application
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zentpoker_test
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3001
+      run: |
+        npm run build
+        npm start &
+        sleep 10
+
+    - name: Run Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v12
+      with:
+        configPath: './lighthouserc.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true

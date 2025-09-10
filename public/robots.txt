@@ -1,0 +1,22 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# 크롤링을 차단할 경로들
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /points/
+Disallow: /vouchers/
+Disallow: /tournaments/
+Disallow: /login
+Disallow: /register
+Disallow: /account-suspended
+Disallow: /unauthorized
+
+# 크롤링 속도 제한 (옵션)
+Crawl-delay: 1
+
+# 사이트맵 위치
+Sitemap: https://zentpoker.com/sitemap.xml
