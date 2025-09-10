@@ -32,78 +32,59 @@ export async function GET(request: NextRequest) {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    // Build where clause
-    const whereClause: any = {};
+    // Build query
+    let query = supabaseAdmin
+      .from('Tournament')
+      .select('*, TournamentEntry(count)', { count: 'exact' });
+    
     if (status) {
-      whereClause.status = status.toUpperCase();
+      query = query.eq('status', status.toUpperCase());
     }
 
     // Fetch tournaments with pagination
-    const [tournaments, totalCount] = await Promise.all([
-      prisma.tournament.findMany({
-        where: whereClause,
-        include: {
-          _count: {
-            select: {
-              entries: true,
-            },
-          },
-        },
-        orderBy: {
-          startDate: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.tournament.count({ where: whereClause }),
-    ]);
+    const { data: tournaments, error: tournamentsError, count: totalCount } = await query
+      .order('startDate', { ascending: false })
+      .range(skip, skip + limit - 1);
+
+    if (tournamentsError) {
+      console.error('Error fetching tournaments:', tournamentsError);
+      return NextResponse.json({ error: 'Failed to fetch tournaments' }, { status: 500 });
+    }
 
     // Get statistics
-    const [upcomingCount, monthlyCount, totalParticipants, allTournamentsForAvg] = await Promise.all([
-      // Upcoming tournaments
-      prisma.tournament.count({
-        where: {
-          status: 'UPCOMING',
-          startDate: {
-            gte: now,
-          },
-        },
-      }),
-      // Monthly tournaments
-      prisma.tournament.count({
-        where: {
-          startDate: {
-            gte: startOfMonth,
-            lte: endOfMonth,
-          },
-        },
-      }),
-      // Total participants across all tournaments
-      prisma.tournamentEntry.count(),
-      // Get all tournaments with entry counts for average calculation
-      prisma.tournament.findMany({
-        select: {
-          maxEntries: true,
-          _count: {
-            select: {
-              entries: true,
-            },
-          },
-        },
-        where: {
-          status: {
-            in: ['COMPLETED', 'IN_PROGRESS'],
-          },
-        },
-      }),
-    ]);
+    const { data: upcomingData } = await supabaseAdmin
+      .from('Tournament')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'UPCOMING')
+      .gte('startDate', now.toISOString());
+
+    const { data: monthlyData } = await supabaseAdmin
+      .from('Tournament')
+      .select('*', { count: 'exact', head: true })
+      .gte('startDate', startOfMonth.toISOString())
+      .lte('startDate', endOfMonth.toISOString());
+
+    const { count: totalParticipants } = await supabaseAdmin
+      .from('TournamentEntry')
+      .select('*', { count: 'exact', head: true });
+
+    const { data: allTournamentsForAvg } = await supabaseAdmin
+      .from('Tournament')
+      .select('maxEntries, TournamentEntry(count)')
+      .in('status', ['COMPLETED', 'IN_PROGRESS']);
+
+    const upcomingCount = upcomingData?.length || 0;
+    const monthlyCount = monthlyData?.length || 0;
 
     // Calculate average participation rate
     let averageParticipationRate = 0;
-    if (allTournamentsForAvg.length > 0) {
+    if (allTournamentsForAvg && allTournamentsForAvg.length > 0) {
       const rates = allTournamentsForAvg
         .filter(t => t.maxEntries && t.maxEntries > 0)
-        .map(t => (t._count.entries / t.maxEntries!) * 100);
+        .map(t => {
+          const entryCount = t.TournamentEntry?.[0]?.count || 0;
+          return (entryCount / t.maxEntries!) * 100;
+        });
       
       if (rates.length > 0) {
         averageParticipationRate = rates.reduce((a, b) => a + b, 0) / rates.length;
@@ -111,32 +92,32 @@ export async function GET(request: NextRequest) {
     }
 
     // Format tournaments for response
-    const formattedTournaments = tournaments.map(tournament => ({
+    const formattedTournaments = (tournaments || []).map(tournament => ({
       id: tournament.id,
       title: tournament.title || tournament.name || 'Unnamed Tournament',
       type: tournament.buyinRequired ? 'Buy-in' : 'Freeroll',
-      startDate: tournament.startDate.toISOString(),
-      endDate: tournament.endDate?.toISOString() || null,
-      location: (tournament as any).location || '신림 잼스 홀덤펍',
+      startDate: tournament.startDate,
+      endDate: tournament.endDate || null,
+      location: tournament.location || '신림 잼스 홀덤펍',
       maxEntries: tournament.maxEntries || null,
       buyinRequired: tournament.buyinRequired,
       rebuyAllowed: tournament.rebuyAllowed,
       status: tournament.status,
-      participantCount: tournament._count.entries,
+      participantCount: tournament.TournamentEntry?.[0]?.count || 0,
     }));
 
     return NextResponse.json({
       tournaments: formattedTournaments,
       pagination: {
-        total: totalCount,
+        total: totalCount || 0,
         page,
         limit,
-        totalPages: Math.ceil(totalCount / limit),
+        totalPages: Math.ceil((totalCount || 0) / limit),
       },
       statistics: {
         upcoming: upcomingCount,
         monthlyCount,
-        totalParticipants,
+        totalParticipants: totalParticipants || 0,
         averageParticipationRate: Math.round(averageParticipationRate),
       },
     });

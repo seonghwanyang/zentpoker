@@ -29,11 +29,9 @@ export async function GET(request: NextRequest) {
         userId,
         type,
         amount,
-        points,
         status,
         description,
-        paymentMethod,
-        paymentDetails,
+        metadata,
         createdAt,
         updatedAt,
         user:User!userId (
@@ -53,15 +51,15 @@ export async function GET(request: NextRequest) {
 
     // Format the response
     const formattedPayments = (pendingPayments || []).map(payment => {
-      const paymentDetails = payment.paymentDetails || {}
+      const metadata = payment.metadata || {}
       return {
         id: payment.id,
         userId: payment.userId,
         userName: payment.user?.name || 'Unknown',
         userEmail: payment.user?.email,
         amount: payment.amount,
-        referenceCode: paymentDetails.referenceCode || `ZP-${payment.id}`,
-        paymentMethod: payment.paymentMethod || 'BANK',
+        referenceCode: metadata.referenceCode || `ZP-${payment.id}`,
+        paymentMethod: metadata.paymentMethod || 'BANK',
         requestedAt: payment.createdAt,
         status: payment.status,
         memo: payment.description || ''
