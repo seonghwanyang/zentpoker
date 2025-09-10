@@ -48,14 +48,21 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // 세션 확인
-  const { data: { session } } = await supabase.auth.getSession();
+  // 세션 새로고침 및 확인
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  
+  // 세션이 있으면 새로고침 시도
+  if (session) {
+    await supabase.auth.refreshSession();
+  }
   
   // 더 안전한 user 확인 (프로덕션에서 권장)
   let authenticatedUser = null;
-  if (session) {
-    const { data: { user } } = await supabase.auth.getUser();
-    authenticatedUser = user;
+  if (session && !sessionError) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (!userError && user) {
+      authenticatedUser = user;
+    }
   }
   
   // 디버깅을 위한 로그 (개발 환경에서만)

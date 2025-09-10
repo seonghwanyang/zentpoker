@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useAuth } from '@/lib/auth/supabase-auth'
 import { redirect } from 'next/navigation'
 import { LayoutWrapper } from '@/components/layout'
 import { Card } from '@/components/ui/card'
@@ -20,30 +20,12 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-const supabase = createClientComponentClient()
-
 export default function TournamentsPage() {
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading } = useAuth()
   const [activeTab, setActiveTab] = useState('upcoming')
   const tournaments = useTournamentStore((state) => state.tournaments)
   const isLoading = useTournamentStore((state) => state.isLoading)
   const fetchTournaments = useTournamentStore((state) => state.fetchTournaments)
-  
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        setUser(user)
-      } catch (error) {
-        console.error('Error fetching user:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    getUser()
-  }, [supabase.auth])
   
   useEffect(() => {
     if (user) {
