@@ -102,9 +102,10 @@ export default function VouchersPage() {
     );
   }
 
-  if (!user) {
-    redirect('/login');
-  }
+  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
+  // if (!user) {
+  //   redirect('/login');
+  // }
 
   // 바인권 필터링
   const now = new Date();

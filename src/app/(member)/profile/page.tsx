@@ -166,9 +166,10 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
-    redirect('/login');
-  }
+  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
+  // if (!user) {
+  //   redirect('/login');
+  // }
 
   // 입력 필드 변경 처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -56,11 +56,12 @@ export default function DashboardPage() {
     }
   });
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
+  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
+  // useEffect(() => {
+  //   if (!loading && !user) {
+  //     router.push('/login');
+  //   }
+  // }, [user, loading, router]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {

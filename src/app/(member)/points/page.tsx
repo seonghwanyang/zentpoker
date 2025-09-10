@@ -124,9 +124,10 @@ export default function PointsPage() {
     );
   }
 
-  if (!user) {
-    redirect('/login');
-  }
+  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
+  // if (!user) {
+  //   redirect('/login');
+  // }
 
   // 선택된 필터와 검색어에 따라 거래 목록 필터링
   const filteredTransactions = transactions.filter(transaction => {

@@ -20,10 +20,11 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
+const supabase = createClientComponentClient()
+
 export default function TournamentsPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClientComponentClient()
   const [activeTab, setActiveTab] = useState('upcoming')
   const tournaments = useTournamentStore((state) => state.tournaments)
   const isLoading = useTournamentStore((state) => state.isLoading)
@@ -97,9 +98,10 @@ export default function TournamentsPage() {
     )
   }
 
-  if (!user) {
-    redirect('/login')
-  }
+  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   return (
     <LayoutWrapper>
