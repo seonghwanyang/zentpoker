@@ -17,10 +17,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+const supabase = createClientComponentClient();
+
 export default function ChargePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
 
   useEffect(() => {
     const getUser = async () => {

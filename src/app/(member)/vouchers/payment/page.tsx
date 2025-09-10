@@ -27,10 +27,11 @@ const BANK_ACCOUNT = {
   accountHolder: 'ZentPoker',
 };
 
+const supabase = createClientComponentClient();
+
 export default function VoucherPaymentPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
   const [referenceCode, setReferenceCode] = useState('');

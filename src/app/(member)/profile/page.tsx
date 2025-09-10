@@ -46,10 +46,11 @@ type Achievement = {
   color: string;
 };
 
+const supabase = createClientComponentClient();
+
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<UserStats>({

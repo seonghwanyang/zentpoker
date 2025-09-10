@@ -39,10 +39,11 @@ type Voucher = {
 
 type VoucherFilter = 'ALL' | 'AVAILABLE' | 'USED' | 'EXPIRED';
 
+const supabase = createClientComponentClient();
+
 export default function VouchersPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
   const [filter, setFilter] = useState<VoucherFilter>('ALL');
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [isLoading, setIsLoading] = useState(true);
