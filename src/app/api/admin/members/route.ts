@@ -38,8 +38,8 @@ export async function GET(request: Request) {
       grade,
       status,
       points,
-      created_at,
-      last_login_at
+      createdAt,
+      lastLoginAt
     `, { count: 'exact' });
 
     // Apply filters
@@ -71,8 +71,8 @@ export async function GET(request: Request) {
       grade,
       status,
       points,
-      created_at,
-      last_login_at
+      createdAt,
+      lastLoginAt
     `);
 
     // Apply same filters
@@ -87,7 +87,7 @@ export async function GET(request: Request) {
     }
 
     const { data: members, error: membersError } = await paginatedQuery
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     if (membersError) {

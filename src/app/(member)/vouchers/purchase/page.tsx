@@ -45,10 +45,11 @@ const voucherPrices = {
   },
 };
 
+const supabase = createClientComponentClient();
+
 export default function VoucherPurchasePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient();
   const router = useRouter();
   const [buyInQuantity, setBuyInQuantity] = useState(0);
   const [reBuyQuantity, setReBuyQuantity] = useState(0);

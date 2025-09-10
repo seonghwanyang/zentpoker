@@ -51,10 +51,11 @@ type Transaction = {
 type TransactionType = 'ALL' | 'REWARD';
 type TransactionStatus = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED';
 
+const supabase = createClientComponentClient();
+
 export default function PointsPage() {
   const [user, setUser] = useSupabaseState<any>(null);
   const [loading, setLoading] = useSupabaseState(true);
-  const supabase = createClientComponentClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<TransactionType>('ALL');
   const [filterStatus, setFilterStatus] = useState<TransactionStatus>('ALL');

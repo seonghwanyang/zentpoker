@@ -59,6 +59,8 @@ interface VoucherData {
   recentVouchers: RecentVoucher[];
 }
 
+const supabase = createClientComponentClient();
+
 export default function AdminVouchersPage() {
   const [user, setUser] = useState<any>(null);
   const [voucherData, setVoucherData] = useState<VoucherData | null>(null);
@@ -69,7 +71,6 @@ export default function AdminVouchersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
 
   // 사용자 인증 상태 확인
   useEffect(() => {

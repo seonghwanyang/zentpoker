@@ -22,37 +22,47 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch pending payment confirmations
-    const pendingPayments = await prisma.transaction.findMany({
-      where: {
-        type: TransactionType.CHARGE,
-        status: TransactionStatus.PENDING
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'asc'
-      }
-    })
+    const { data: pendingPayments, error: paymentsError } = await supabaseAdmin
+      .from('Transaction')
+      .select(`
+        id,
+        userId,
+        type,
+        amount,
+        points,
+        status,
+        description,
+        paymentMethod,
+        paymentDetails,
+        createdAt,
+        updatedAt,
+        user:User!userId (
+          id,
+          name,
+          email
+        )
+      `)
+      .eq('type', 'CHARGE')
+      .eq('status', 'PENDING')
+      .order('createdAt', { ascending: true })
+
+    if (paymentsError) {
+      console.error('Error fetching pending payments:', paymentsError)
+      return NextResponse.json({ error: 'Failed to fetch pending payments' }, { status: 500 })
+    }
 
     // Format the response
-    const formattedPayments = pendingPayments.map(payment => {
-      const metadata = payment.metadata as any || {}
+    const formattedPayments = (pendingPayments || []).map(payment => {
+      const paymentDetails = payment.paymentDetails || {}
       return {
         id: payment.id,
         userId: payment.userId,
-        userName: payment.user.name || 'Unknown',
-        userEmail: payment.user.email,
+        userName: payment.user?.name || 'Unknown',
+        userEmail: payment.user?.email,
         amount: payment.amount,
-        referenceCode: metadata.referenceCode || `ZP-${payment.id}`,
-        paymentMethod: metadata.paymentMethod || 'BANK',
-        requestedAt: payment.createdAt.toISOString(),
+        referenceCode: paymentDetails.referenceCode || `ZP-${payment.id}`,
+        paymentMethod: payment.paymentMethod || 'BANK',
+        requestedAt: payment.createdAt,
         status: payment.status,
         memo: payment.description || ''
       }
