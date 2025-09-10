@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 쿠키 정리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .error-title {
+            color: #991b1b;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .error-message {
+            color: #7f1d1d;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result.success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #166534;
+            display: block;
+        }
+        
+        .result.info {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #1e40af;
+            display: block;
+        }
+        
+        .cookie-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .cookie-item {
+            padding: 5px 0;
+            color: #6b7280;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .instructions h3 {
+            color: #4b5563;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍪 Supabase 쿠키 정리</h1>
+        <p class="subtitle">로그인 문제 해결을 위한 쿠키 초기화 도구</p>
+        
+        <div class="error-box">
+            <div class="error-title">⚠️ 현재 발생중인 오류</div>
+            <div class="error-message">Failed to parse cookie string: Unexpected token 'b', "base64-eyJ"...</div>
+        </div>
+        
+        <button onclick="clearCookies()" id="clearBtn">
+            쿠키 정리하기
+        </button>
+        
+        <div id="result" class="result"></div>
+        
+        <div id="cookieList" class="cookie-list" style="display: none;">
+            <strong>삭제된 항목:</strong>
+            <div id="deletedItems"></div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📝 사용 방법</h3>
+            <ol>
+                <li>위의 "쿠키 정리하기" 버튼을 클릭하세요</li>
+                <li>완료 메시지가 나타나면 페이지를 새로고침하세요 (F5)</li>
+                <li>메인 페이지로 돌아가서 다시 로그인하세요</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        function clearCookies() {
+            const button = document.getElementById('clearBtn');
+            const result = document.getElementById('result');
+            const cookieList = document.getElementById('cookieList');
+            const deletedItems = document.getElementById('deletedItems');
+            
+            // 버튼 비활성화 및 로딩 표시
+            button.innerHTML = '<span class="loading"></span> 처리중...';
+            button.disabled = true;
+            
+            let deletedCount = 0;
+            let deletedList = [];
+            
+            // 쿠키 삭제
+            const cookies = document.cookie.split(';');
+            cookies.forEach(cookie => {
+                const eqPos = cookie.indexOf('=');
+                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                
+                if (name && (name.includes('supabase') || name.includes('sb-') || name.includes('auth'))) {
+                    // 여러 경로에 대해 쿠키 삭제 시도
+                    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost';
+                    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
+                    
+                    deletedList.push(name);
+                    deletedCount++;
+                    console.log('Deleted cookie:', name);
+                }
+            });
+            
+            // localStorage 정리
+            let localStorageCount = 0;
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('supabase') || key.includes('sb-') || key.includes('auth')) {
+                    localStorage.removeItem(key);
+                    deletedList.push('localStorage: ' + key);
+                    localStorageCount++;
+                    console.log('Deleted localStorage:', key);
+                }
+            });
+            
+            // sessionStorage 정리
+            let sessionStorageCount = 0;
+            Object.keys(sessionStorage).forEach(key => {
+                if (key.includes('supabase') || key.includes('sb-') || key.includes('auth')) {
+                    sessionStorage.removeItem(key);
+                    deletedList.push('sessionStorage: ' + key);
+                    sessionStorageCount++;
+                    console.log('Deleted sessionStorage:', key);
+                }
+            });
+            
+            // 결과 표시
+            setTimeout(() => {
+                button.innerHTML = '✅ 완료!';
+                button.disabled = false;
+                
+                if (deletedCount > 0 || localStorageCount > 0 || sessionStorageCount > 0) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <strong>✨ 정리 완료!</strong><br>
+                        쿠키 ${deletedCount}개, localStorage ${localStorageCount}개, sessionStorage ${sessionStorageCount}개 삭제됨<br>
+                        <strong>이제 페이지를 새로고침(F5)하고 다시 로그인하세요.</strong>
+                    `;
+                    
+                    if (deletedList.length > 0) {
+                        cookieList.style.display = 'block';
+                        deletedItems.innerHTML = deletedList.map(item => 
+                            `<div class="cookie-item">• ${item}</div>`
+                        ).join('');
+                    }
+                } else {
+                    result.className = 'result info';
+                    result.innerHTML = `
+                        <strong>ℹ️ 삭제할 쿠키가 없습니다</strong><br>
+                        이미 정리되었거나 다른 문제일 수 있습니다.<br>
+                        브라우저를 완전히 종료 후 다시 시도해보세요.
+                    `;
+                }
+                
+                // 3초 후 버튼 원래대로
+                setTimeout(() => {
+                    button.innerHTML = '쿠키 정리하기';
+                }, 3000);
+            }, 500);
+        }
+        
+        // 페이지 로드 시 현재 쿠키 상태 확인
+        window.onload = function() {
+            const cookies = document.cookie.split(';');
+            let supabaseCookies = 0;
+            
+            cookies.forEach(cookie => {
+                const name = cookie.split('=')[0].trim();
+                if (name && (name.includes('supabase') || name.includes('sb-'))) {
+                    supabaseCookies++;
+                }
+            });
+            
+            if (supabaseCookies > 0) {
+                console.log(`Found ${supabaseCookies} Supabase-related cookies`);
+            }
+        };
+    </script>
+</body>
+</html>
