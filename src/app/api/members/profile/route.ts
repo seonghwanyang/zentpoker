@@ -10,7 +10,7 @@ export async function GET() {
       return unauthorizedResponse();
     }
 
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: userData, error: userError } = await supabaseAdmin
       .from('User')
       .select(`
         id,
@@ -37,20 +37,20 @@ export async function GET() {
     const { count: transactionCount, error: transactionError } = await supabaseAdmin
       .from('Transaction')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
+      .eq('user_id', userData.id);
 
     // Get voucher count
     const { count: voucherCount, error: voucherError } = await supabaseAdmin
       .from('Voucher')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
+      .eq('user_id', userData.id);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({
-      ...user,
+      ...userData,
       transactionCount: transactionCount || 0,
       voucherCount: voucherCount || 0,
     });

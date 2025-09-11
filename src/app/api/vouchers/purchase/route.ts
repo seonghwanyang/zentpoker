@@ -25,14 +25,14 @@ export async function POST(request: Request) {
     // In production, consider using database-level constraints or stored procedures for data integrity
     
     // 사용자 조회
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: userData, error: userDataError } = await supabaseAdmin
       .from('User')
       .select('*')
       .eq('email', user.email!)
       .single();
 
-    if (userError || !user) {
-      console.error('Error fetching user:', userError);
+    if (userDataError || !userData) {
+      console.error('Error fetching userData:', userDataError);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       .from('voucher_pricing')
       .select('*')
       .eq('type', type)
-      .eq('member_grade', user.grade)
+      .eq('member_grade', userData.grade)
       .eq('is_active', true)
       .single();
 
@@ -53,26 +53,26 @@ export async function POST(request: Request) {
     const totalPrice = pricing.price * quantity;
 
     // 포인트 잔액 확인
-    if (user.points < totalPrice) {
+    if (userData.points < totalPrice) {
       return NextResponse.json({ error: 'Insufficient points' }, { status: 400 });
     }
 
     // 포인트 차감
     const { data: updatedUser, error: updateError } = await supabaseAdmin
       .from('User')
-      .update({ points: user.points - totalPrice })
-      .eq('id', user.id)
+      .update({ points: userData.points - totalPrice })
+      .eq('id', userData.id)
       .select('points')
       .single();
 
     if (updateError || !updatedUser) {
-      console.error('Error updating user points:', updateError);
+      console.error('Error updating userData points:', updateError);
       return NextResponse.json({ error: 'Failed to update points' }, { status: 500 });
     }
 
     // 바인권 생성
     const voucherData = Array(quantity).fill(null).map(() => ({
-      user_id: user.id,
+      userData_id: userData.id,
       type: type,
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30일
     }));
@@ -87,8 +87,8 @@ export async function POST(request: Request) {
       // Try to rollback points
       await supabaseAdmin
         .from('User')
-        .update({ points: user.points })
-        .eq('id', user.id);
+        .update({ points: userData.points })
+        .eq('id', userData.id);
       return NextResponse.json({ error: 'Failed to create vouchers' }, { status: 500 });
     }
 
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
     const { data: transaction, error: transactionError } = await supabaseAdmin
       .from('Transaction')
       .insert({
-        user_id: user.id,
+        userData_id: userData.id,
         type: 'VOUCHER_PURCHASE',
         amount: -totalPrice,
         status: 'COMPLETED',
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
     const { error: pointLogError } = await supabaseAdmin
       .from('point_logs')
       .insert({
-        user_id: user.id,
+        userData_id: userData.id,
         amount: -totalPrice,
         type: '구매',
         description: `${type === 'BUYIN' ? 'Buy-in' : 'Re-buy'} 바인권 ${quantity}개 구매`,

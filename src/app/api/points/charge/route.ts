@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     // 사용자 조회
-    const { data: user, error: userError } = await supabaseAdmin
+    const { data: userData, error: userError } = await supabaseAdmin
       .from('User')
       .select('*')
       .eq('email', user.email)
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User lookup failed' }, { status: 500 });
     }
 
-    if (!user) {
+    if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const { data: transaction, error: transactionError } = await supabaseAdmin
       .from('Transaction')
       .insert({
-        user_id: user.id,
+        user_id: userData.id,
         type: 'CHARGE',
         amount: amount,
         status: 'PENDING',
