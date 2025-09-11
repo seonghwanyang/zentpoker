@@ -176,7 +176,7 @@ export default function PointsPage() {
       case 'COMPLETED':
         return <Badge variant="success">완료</Badge>;
       case 'PENDING':
-        return <Badge variant="warning">대기중</Badge>;
+        return <Badge variant="secondary">대기중</Badge>;
       case 'FAILED':
         return <Badge variant="destructive">실패</Badge>;
       default:
@@ -276,7 +276,7 @@ export default function PointsPage() {
                 <Input
                   placeholder="검색..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -336,7 +336,7 @@ export default function PointsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredTransactions.map((transaction) => (
+                {filteredTransactions.map((transaction: Transaction) => (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors"

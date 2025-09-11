@@ -27,9 +27,9 @@ const tournamentSchema = z.object({
   longDescription: z.string().optional(),
   startDate: z.string().min(1, '시작 날짜를 선택해주세요'),
   startTime: z.string().min(1, '시작 시간을 선택해주세요'),
-  lateRegistration: z.string().transform((val) => parseInt(val)),
+  lateRegistration: z.string().transform((val: string) => parseInt(val)),
   reEntry: z.boolean(),
-  maxReEntries: z.string().transform((val) => parseInt(val)).optional(),
+  maxReEntries: z.string().transform((val: string) => parseInt(val)).optional(),
 })
 
 type TournamentFormData = z.infer<typeof tournamentSchema>
@@ -204,7 +204,7 @@ export default function CreateTournamentPage() {
               <div>
                 <Label>리엔트리 허용</Label>
                 <Select
-                  onValueChange={(value) => {
+                  onValueChange={(value: string) => {
                     const allowed = value === 'true'
                     setAllowReEntry(allowed)
                     setValue('reEntry', allowed)

@@ -394,7 +394,7 @@ export default function AdminVoucherPricingPage() {
         description="정말로 바인권 가격을 변경하시겠습니까? 변경된 가격은 즉시 적용됩니다."
         confirmText="변경"
         onConfirm={handleSave}
-        isLoading={isSaving}
+        loading={isSaving}
       />
     </div>
   )

@@ -27,10 +27,25 @@ import {
 import { useTournamentStore } from '@/stores/tournament-store'
 import Link from 'next/link';
 
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  description: string;
+  createdAt: Date | string;
+}
+
+interface Voucher {
+  id: string;
+  type: string;
+  status: string;
+  expiresAt: Date | string;
+}
+
 interface DashboardData {
   balance: number;
-  vouchers: any[];
-  recentTransactions: any[];
+  vouchers: Voucher[];
+  recentTransactions: Transaction[];
   stats: {
     totalVouchers: number;
     monthlyUsage: number;
@@ -358,7 +373,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {dashboardData.recentTransactions.length > 0 ? (
-                  dashboardData.recentTransactions.map((transaction) => (
+                  dashboardData.recentTransactions.map((transaction: Transaction) => (
                     <div key={transaction.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-full ${
@@ -412,7 +427,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="grid grid-cols-1 gap-3">
                 {dashboardData.vouchers.length > 0 ? (
-                  dashboardData.vouchers.slice(0, 2).map((voucher) => (
+                  dashboardData.vouchers.slice(0, 2).map((voucher: Voucher) => (
                     <VoucherCard
                       key={voucher.id}
                       type={voucher.type}
@@ -462,7 +477,7 @@ export default function DashboardPage() {
                 {tournaments
                   .filter(t => t.status === 'UPCOMING')
                   .slice(0, 2)
-                  .map((tournament) => {
+                  .map((tournament: any) => {
                     const tournamentDate = new Date(tournament.startDate)
                     return (
                       <div key={tournament.id} className="p-4 rounded-lg border hover:border-purple-300 transition-colors">
@@ -482,7 +497,7 @@ export default function DashboardPage() {
                               </span>
                               <span className="flex items-center gap-1">
                                 <DollarSign className="h-3 w-3" />
-                                {tournament.buyIn.toLocaleString()}원
+                                {tournament.buyIn?.toLocaleString() || 0}원
                               </span>
                             </div>
                           </div>

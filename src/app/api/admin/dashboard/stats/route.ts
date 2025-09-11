@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       .eq('status', 'PENDING');
 
     const pendingCount = pendingDeposits?.length || 0;
-    const pendingTotal = pendingDeposits?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0;
+    const pendingTotal = pendingDeposits?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) || 0;
 
     // 오늘 입금액
     const { data: todayDepositsData } = await supabaseAdmin
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       .gte('created_at', today.toISOString())
       .lt('created_at', tomorrow.toISOString());
 
-    const todayAmount = todayDepositsData?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0;
+    const todayAmount = todayDepositsData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) || 0;
 
     // 어제 입금액 (비교용)
     const yesterday = new Date(today);
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       .gte('created_at', yesterday.toISOString())
       .lt('created_at', today.toISOString());
 
-    const yesterdayAmount = yesterdayDepositsData?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0;
+    const yesterdayAmount = yesterdayDepositsData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) || 0;
 
     // 이번 달 입금액
     const { data: monthlyDepositsData } = await supabaseAdmin
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       .gte('created_at', monthStart.toISOString())
       .lte('created_at', monthEnd.toISOString());
 
-    const monthlyAmount = monthlyDepositsData?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0;
+    const monthlyAmount = monthlyDepositsData?.reduce((sum: number, t: any) => sum + (t.amount || 0), 0) || 0;
 
     // 발급된 바인권 수
     const { count: totalVouchers } = await supabaseAdmin

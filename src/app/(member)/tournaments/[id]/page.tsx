@@ -341,7 +341,7 @@ export default function TournamentDetailPage() {
                 </p>
                 
                 <div className="grid gap-3">
-                  {availableVouchers.map((voucher) => (
+                  {availableVouchers.map((voucher: Voucher) => (
                     <div
                       key={voucher.id}
                       className={`relative cursor-pointer transition-all ${
@@ -351,7 +351,7 @@ export default function TournamentDetailPage() {
                     >
                       <VoucherCard 
                         type={voucher.type === 'BUY_IN' ? 'BUYIN' : 'REBUY'}
-                        status={voucher.status}
+                        status={voucher.status as 'ACTIVE' | 'USED' | 'EXPIRED'}
                         purchasePrice={voucher.price}
                         expiresAt={new Date(voucher.expiresAt)}
                       />
@@ -434,7 +434,7 @@ export default function TournamentDetailPage() {
             </h3>
             
             <div className="space-y-3">
-              {tournament.prizeStructure.map((prize, index) => (
+              {tournament.prizeStructure.map((prize: { place: number; percentage: number }, index: number) => (
                 <div
                   key={prize.place}
                   className={`flex items-center justify-between p-4 rounded-lg ${
@@ -478,7 +478,7 @@ export default function TournamentDetailPage() {
             <h3 className="text-lg font-semibold mb-4">등록된 참가자</h3>
             
             <div className="space-y-2">
-              {tournament.registeredPlayers.map((player, index) => (
+              {tournament.registeredPlayers.map((player: { id: string; name: string; status: string; registeredAt: string }, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50"
@@ -506,7 +506,7 @@ export default function TournamentDetailPage() {
         description="선택한 바인권을 사용하여 토너먼트에 참가하시겠습니까?"
         confirmText="참가 신청"
         onConfirm={handleRegistration}
-        isLoading={isRegistering}
+        loading={isRegistering}
       />
     </div>
   </LayoutWrapper>

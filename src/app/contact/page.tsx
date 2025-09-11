@@ -174,7 +174,7 @@ export default function ContactPage() {
                   id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('name', e.target.value)}
                   placeholder="홍길동"
                 />
               </div>
@@ -185,7 +185,7 @@ export default function ContactPage() {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('email', e.target.value)}
                   placeholder="email@example.com"
                 />
               </div>
@@ -198,7 +198,7 @@ export default function ContactPage() {
                   id="phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('phone', e.target.value)}
                   placeholder="010-1234-5678"
                 />
               </div>
@@ -229,7 +229,7 @@ export default function ContactPage() {
                 id="subject"
                 required
                 value={formData.subject}
-                onChange={(e) => handleChange('subject', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('subject', e.target.value)}
                 placeholder="문의 제목을 입력하세요"
               />
             </div>
@@ -241,7 +241,7 @@ export default function ContactPage() {
                 required
                 rows={6}
                 value={formData.message}
-                onChange={(e) => handleChange('message', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange('message', e.target.value)}
                 placeholder="문의하실 내용을 자세히 작성해주세요"
                 className="resize-none"
               />
