@@ -430,8 +430,8 @@ export default function DashboardPage() {
                   dashboardData.vouchers.slice(0, 2).map((voucher: Voucher) => (
                     <VoucherCard
                       key={voucher.id}
-                      type={voucher.type}
-                      status={voucher.status}
+                      type={voucher.type as 'BUYIN' | 'REBUY'}
+                      status={voucher.status as 'ACTIVE' | 'USED' | 'EXPIRED'}
                       purchasePrice={voucher.type === 'BUYIN' 
                         ? (memberGrade === 'GUEST' ? PRICING.VOUCHER.BUY_IN.GUEST : PRICING.VOUCHER.BUY_IN.REGULAR)
                         : (memberGrade === 'GUEST' ? PRICING.VOUCHER.RE_BUY.GUEST : PRICING.VOUCHER.RE_BUY.REGULAR)
