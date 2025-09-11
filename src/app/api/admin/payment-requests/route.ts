@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       .from('PaymentRequest')
       .select(`
         *,
-        User (
+        User!PaymentRequest_userId_fkey (
           id,
           name,
           email,

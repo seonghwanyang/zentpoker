@@ -75,18 +75,46 @@ export default function AdminPaymentConfirmPage() {
   const fetchPendingPayments = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/admin/payments/pending')
+      const response = await fetch('/api/admin/payment-requests')
       
       if (!response.ok) {
         throw new Error('Failed to fetch payments')
       }
       
       const data = await response.json()
-      setPayments(data.payments || [])
-      setStats(data.stats || {
-        totalCount: 0,
-        totalAmount: 0,
-        averageWaitTime: 0
+      
+      // PaymentRequest 데이터를 Payment 인터페이스로 매핑
+      const mappedPayments = data
+        .filter((req: any) => req.status === 'PENDING')
+        .map((req: any) => ({
+          id: req.id,
+          userId: req.userId,
+          userName: req.depositorName || '알 수 없음', // depositorName 사용
+          userEmail: req.User?.email || '',
+          amount: req.amount,
+          referenceCode: req.id.slice(0, 8).toUpperCase(),
+          paymentMethod: 'BANK' as const,
+          requestedAt: req.requestDate,
+          status: req.status,
+          memo: req.memo || ''
+        }))
+      
+      setPayments(mappedPayments)
+      
+      // 통계 계산
+      const totalAmount = mappedPayments.reduce((sum: number, p: any) => sum + p.amount, 0)
+      const avgWaitTime = mappedPayments.length > 0 
+        ? Math.floor(mappedPayments.reduce((sum: number, p: any) => {
+            const now = new Date()
+            const requested = new Date(p.requestedAt)
+            return sum + (now.getTime() - requested.getTime()) / 60000
+          }, 0) / mappedPayments.length)
+        : 0
+      
+      setStats({
+        totalCount: mappedPayments.length,
+        totalAmount: totalAmount,
+        averageWaitTime: avgWaitTime
       })
     } catch (error) {
       console.error('Error fetching payments:', error)
@@ -130,15 +158,15 @@ export default function AdminPaymentConfirmPage() {
     setIsProcessing(true)
     
     try {
-      const response = await fetch('/api/admin/payments/confirm', {
+      const response = await fetch('/api/admin/payment-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          transactionId: selectedPayment.id,
-          action: 'approve',
-          note: confirmMemo,
+          requestId: selectedPayment.id,
+          action: 'CONFIRM',
+          memo: confirmMemo,
         }),
       })
 
@@ -181,15 +209,15 @@ export default function AdminPaymentConfirmPage() {
     setIsProcessing(true)
     
     try {
-      const response = await fetch('/api/admin/payments/confirm', {
+      const response = await fetch('/api/admin/payment-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          transactionId: selectedPayment.id,
-          action: 'reject',
-          note: rejectReason,
+          requestId: selectedPayment.id,
+          action: 'REJECT',
+          memo: rejectReason,
         }),
       })
 
