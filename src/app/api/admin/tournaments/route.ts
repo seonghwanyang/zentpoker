@@ -130,6 +130,92 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getApiUser();
+    
+    if (!user?.email) {
+      return unauthorizedResponse();
+    }
+
+    // 관리자 권한 확인
+    const { data: admin, error: adminError } = await supabaseAdmin
+      .from('User')
+      .select('id, role')
+      .eq('email', user.email)
+      .single();
+
+    if (adminError || !admin || admin.role !== 'ADMIN') {
+      return forbiddenResponse();
+    }
+
+    const body = await request.json();
+    const {
+      title,
+      name,
+      description,
+      type,
+      startDate,
+      endDate,
+      location,
+      buyinRequired,
+      rebuyAllowed,
+      maxEntries,
+      status
+    } = body;
+
+    // 필수 필드 검증
+    if (!title || !startDate) {
+      return NextResponse.json(
+        { error: 'Title and start date are required' },
+        { status: 400 }
+      );
+    }
+
+    // 토너먼트 생성
+    const { data: tournament, error: createError } = await supabaseAdmin
+      .from('Tournament')
+      .insert({
+        id: crypto.randomUUID(),
+        title,
+        name: name || title,
+        description: description || '',
+        type: type || 'REGULAR',
+        startDate,
+        endDate: endDate || null,
+        location: location || '신림 잼스 홀덤펍',
+        buyinRequired: buyinRequired || 1,
+        rebuyAllowed: rebuyAllowed !== false,
+        maxEntries: maxEntries || null,
+        status: status || 'UPCOMING',
+        createdBy: admin.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (createError) {
+      console.error('Tournament creation error:', createError);
+      return NextResponse.json(
+        { error: 'Failed to create tournament' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      tournament
+    });
+  } catch (error) {
+    console.error('Tournament creation error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create tournament' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const user = await getApiUser();

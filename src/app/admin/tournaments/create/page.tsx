@@ -60,24 +60,34 @@ export default function CreateTournamentPage() {
 
     try {
       // 토너먼트 데이터 생성
-      const newTournament = {
-        id: Date.now().toString(),
+      const tournamentData = {
+        title: data.name,
         name: data.name,
+        description: data.longDescription || '',
         type: 'REGULAR',
         startDate: `${data.startDate}T${data.startTime}:00`,
-        location: '온라인',
-        buyIn: 50000,
-        guaranteedPrize: 0,
-        maxPlayers: 50,
-        currentPlayers: 0,
-        status: 'UPCOMING' as const,
+        location: '신림 잼스 홀덤펍',
+        buyinRequired: 1,
+        rebuyAllowed: data.reEntry || false,
+        maxEntries: data.maxReEntries || 100,
+        status: 'UPCOMING',
       }
 
-      // 스토어에 추가
-      addTournament(newTournament)
+      // 실제 API 호출
+      const response = await fetch('/api/admin/tournaments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tournamentData),
+      })
 
-      // API 호출 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 500))
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create tournament')
+      }
+
+      const result = await response.json()
 
       toast({
         title: '토너먼트 생성 완료',
@@ -86,9 +96,10 @@ export default function CreateTournamentPage() {
 
       router.push('/admin/tournaments')
     } catch (error) {
+      console.error('Tournament creation error:', error)
       toast({
         title: '오류 발생',
-        description: '토너먼트 생성 중 오류가 발생했습니다.',
+        description: error instanceof Error ? error.message : '토너먼트 생성 중 오류가 발생했습니다.',
         variant: 'destructive',
       })
     } finally {

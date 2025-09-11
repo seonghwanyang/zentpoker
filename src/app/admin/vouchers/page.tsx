@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { redirect } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,10 +58,7 @@ interface VoucherData {
   recentVouchers: RecentVoucher[];
 }
 
-const supabase = createClientComponentClient();
-
 export default function AdminVouchersPage() {
-  const [user, setUser] = useState<any>(null);
   const [voucherData, setVoucherData] = useState<VoucherData | null>(null);
   const [prices, setPrices] = useState<VoucherPricing>({
     BUYIN: { REGULAR: 0, GUEST: 0 },
@@ -72,40 +68,32 @@ export default function AdminVouchersPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 사용자 인증 상태 확인
+  // 컴포넌트 마운트 시 바로 데이터 가져오기 (인증은 API에서 체크)
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        
-        if (user && user.email === 'yangseonghwan119@gmail.com') {
-          fetchVoucherData();
-        }
-      } catch (error) {
-        console.error('Error checking user:', error);
-        setError('사용자 인증에 실패했습니다.');
-      }
-    };
-
-    checkUser();
-  }, [supabase]);
+    console.log('컴포넌트 마운트, fetchVoucherData 직접 호출');
+    fetchVoucherData();
+  }, []);
 
   // 권한 체크 - 제거 (layout.tsx에서 이미 처리)
   // admin/layout.tsx에서 권한 체크를 하므로 여기서는 불필요
 
   // 바우처 데이터 가져오기
   const fetchVoucherData = async () => {
+    console.log('fetchVoucherData 함수 호출됨');
     try {
       setIsLoading(true);
       setError(null);
       
+      console.log('API 호출 시작: /api/admin/vouchers/stats');
       const response = await fetch('/api/admin/vouchers/stats');
+      console.log('API 응답 상태:', response.status);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch voucher data');
       }
       
       const data: VoucherData = await response.json();
+      console.log('받은 데이터:', data);
       setVoucherData(data);
       setPrices(data.pricing);
     } catch (error) {
