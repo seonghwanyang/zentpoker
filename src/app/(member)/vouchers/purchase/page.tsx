@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PaymentRequestDialog } from '@/components/vouchers/payment-request-dialog';
 import {
   Ticket,
   Wallet,
@@ -29,6 +30,7 @@ import {
   Minus,
   AlertCircle,
   CreditCard,
+  BanknoteIcon,
 } from 'lucide-react';
 
 // 가격 데이터를 중앙 설정에서 가져오기
@@ -55,9 +57,11 @@ export default function VoucherPurchasePage() {
   const [reBuyQuantity, setReBuyQuantity] = useState(0);
   const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'points' | 'direct' | null>(null);
+  const [showPaymentRequestDialog, setShowPaymentRequestDialog] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'points' | 'direct' | 'bank' | null>(null);
   const [currentBalance, setCurrentBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedVoucherType, setSelectedVoucherType] = useState<'BUYIN' | 'REBUY' | null>(null);
   
   useEffect(() => {
     const getUser = async () => {
@@ -153,7 +157,7 @@ export default function VoucherPurchasePage() {
   };
 
   // 결제 방법 선택
-  const handlePaymentMethodSelect = (method: 'points' | 'direct') => {
+  const handlePaymentMethodSelect = (method: 'points' | 'direct' | 'bank') => {
     setSelectedPaymentMethod(method);
     setShowPaymentMethodDialog(false);
 
@@ -168,6 +172,15 @@ export default function VoucherPurchasePage() {
         return;
       }
       setShowConfirmDialog(true);
+    } else if (method === 'bank') {
+      // 계좌이체 선택 시 입금 확인 요청 다이얼로그 표시
+      // 구매할 바인권 타입 결정 (바인권과 리바이권 중 더 많은 것 선택, 같으면 바인권)
+      if (buyInQuantity > 0 || (buyInQuantity === reBuyQuantity && buyInQuantity > 0)) {
+        setSelectedVoucherType('BUYIN');
+      } else if (reBuyQuantity > 0) {
+        setSelectedVoucherType('REBUY');
+      }
+      setShowPaymentRequestDialog(true);
     } else {
       // 직접 결제인 경우 결제 페이지로 이동
       const paymentData = {
@@ -525,17 +538,33 @@ export default function VoucherPurchasePage() {
                 </div>
               </button>
 
-              {/* 직접 결제 옵션 */}
+              {/* 계좌이체 옵션 */}
               <button
-                onClick={() => handlePaymentMethodSelect('direct')}
+                onClick={() => handlePaymentMethodSelect('bank')}
                 className="w-full p-4 rounded-lg border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <CreditCard className="h-6 w-6 text-purple-600" />
+                    <BanknoteIcon className="h-6 w-6 text-purple-600" />
                     <div className="text-left">
-                      <p className="font-semibold text-gray-900">직접 결제</p>
-                      <p className="text-sm text-gray-500">카카오페이로 결제</p>
+                      <p className="font-semibold text-gray-900">계좌이체</p>
+                      <p className="text-sm text-gray-500">입금 후 확인 요청</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* 직접 결제 옵션 (현재 비활성화) */}
+              <button
+                disabled
+                className="w-full p-4 rounded-lg border-2 border-gray-100 bg-gray-50 cursor-not-allowed opacity-60"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-6 w-6 text-gray-400" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-500">카카오페이</p>
+                      <p className="text-sm text-gray-400">준비 중</p>
                     </div>
                   </div>
                 </div>
@@ -543,6 +572,17 @@ export default function VoucherPurchasePage() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* 입금 확인 요청 다이얼로그 */}
+        {selectedVoucherType && (
+          <PaymentRequestDialog
+            open={showPaymentRequestDialog}
+            onOpenChange={setShowPaymentRequestDialog}
+            voucherType={selectedVoucherType}
+            amount={totalPrice}
+            quantity={totalQuantity}
+          />
+        )}
 
         {/* 포인트 구매 확인 다이얼로그 */}
         <ConfirmDialog

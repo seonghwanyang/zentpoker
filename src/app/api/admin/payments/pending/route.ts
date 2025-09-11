@@ -1,48 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getApiUser, unauthorizedResponse, forbiddenResponse } from '@/lib/auth/api-auth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getApiUser()
+    const supabase = createClient()
     
-    if (!user?.email) {
-      return unauthorizedResponse()
+    // 현재 사용자 확인
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    // Check admin role
-    const { data: admin, error: adminError } = await supabaseAdmin
+    // 관리자 권한 확인
+    const { data: userData } = await supabase
       .from('User')
       .select('role')
       .eq('email', user.email)
       .single()
 
-    if (adminError || !admin || admin.role !== 'ADMIN') {
-      return forbiddenResponse()
+    if (userData?.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Admin access required' },
+        { status: 403 }
+      )
     }
 
-    // Fetch pending payment confirmations
-    const { data: pendingPayments, error: paymentsError } = await supabaseAdmin
-      .from('Transaction')
+    // PaymentRequest 테이블에서 PENDING 상태의 요청 조회
+    const { data: pendingPayments, error: paymentsError } = await supabase
+      .from('PaymentRequest')
       .select(`
-        id,
-        userId,
-        type,
-        amount,
-        status,
-        description,
-        metadata,
-        createdAt,
-        updatedAt,
-        user:User!userId (
+        *,
+        User!PaymentRequest_userId_fkey (
           id,
           name,
-          email
+          email,
+          grade
         )
       `)
-      .eq('type', 'CHARGE')
       .eq('status', 'PENDING')
-      .order('createdAt', { ascending: true })
+      .order('requestDate', { ascending: true })
 
     if (paymentsError) {
       console.error('Error fetching pending payments:', paymentsError)
@@ -51,18 +51,21 @@ export async function GET(request: NextRequest) {
 
     // Format the response
     const formattedPayments = (pendingPayments || []).map(payment => {
-      const metadata = payment.metadata || {}
       return {
         id: payment.id,
         userId: payment.userId,
-        userName: payment.user?.name || 'Unknown',
-        userEmail: payment.user?.email,
+        userName: payment['User!PaymentRequest_userId_fkey']?.name || '알 수 없음',
+        userEmail: payment['User!PaymentRequest_userId_fkey']?.email,
+        userGrade: payment['User!PaymentRequest_userId_fkey']?.grade || 'GUEST',
         amount: payment.amount,
-        referenceCode: metadata.referenceCode || `ZP-${payment.id}`,
-        paymentMethod: metadata.paymentMethod || 'BANK',
-        requestedAt: payment.createdAt,
+        voucherType: payment.voucherType,
+        depositorName: payment.depositorName,
+        bankName: payment.bankName || '',
+        referenceCode: `ZP-${payment.id.slice(0, 8).toUpperCase()}`,
+        paymentMethod: 'BANK',
+        requestedAt: payment.requestDate,
         status: payment.status,
-        memo: payment.description || ''
+        memo: payment.memo || ''
       }
     })
 
@@ -91,7 +94,8 @@ function calculateAverageWaitTime(payments: any[]): number {
   
   const now = new Date()
   const totalMinutes = payments.reduce((sum, payment) => {
-    const diff = now.getTime() - payment.createdAt.getTime()
+    const requestTime = new Date(payment.requestDate || payment.createdAt)
+    const diff = now.getTime() - requestTime.getTime()
     return sum + Math.floor(diff / 60000)
   }, 0)
   
