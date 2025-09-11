@@ -12,7 +12,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
-  role: 'ADMIN' | 'MEMBER' | 'GUEST' | null;
+  role: 'ADMIN' | 'USER' | 'GUEST' | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<'ADMIN' | 'MEMBER' | 'GUEST' | null>(null);
+  const [role, setRole] = useState<'ADMIN' | 'USER' | 'GUEST' | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             // 신규 사용자 생성 - Supabase Auth ID 사용
             console.log('Creating new user for:', session.user.email);
-            const newRole = session.user.email === adminEmail ? 'ADMIN' : 'MEMBER';
+            const newRole = session.user.email === adminEmail ? 'ADMIN' : 'USER';
             
             // 새 사용자는 Supabase Auth ID를 사용
             const { error: insertError } = await supabase.from('User').insert({
@@ -166,8 +166,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setRole(null);
       }
       
-      // 로그인 성공시 대시보드로 이동 (콜백 페이지에서는 스킵)
-      if (event === 'SIGNED_IN' && !window.location.pathname.includes('/auth/callback')) {
+      // 로그인 성공시 리다이렉트 (콜백 페이지와 이미 대시보드인 경우 스킵)
+      if (event === 'SIGNED_IN' && 
+          !window.location.pathname.includes('/auth/callback') &&
+          !window.location.pathname.includes('/dashboard')) {
         console.log('Redirecting to dashboard after sign in');
         router.push('/dashboard');
       }

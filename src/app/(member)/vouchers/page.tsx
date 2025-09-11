@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase-client';
 import { redirect } from 'next/navigation';
 import { LayoutWrapper } from '@/components/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,8 +39,6 @@ type Voucher = {
 
 type VoucherFilter = 'ALL' | 'AVAILABLE' | 'USED' | 'EXPIRED';
 
-const supabase = createClientComponentClient();
-
 export default function VouchersPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +49,7 @@ export default function VouchersPage() {
   useEffect(() => {
     const getUser = async () => {
       try {
+        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
@@ -61,7 +60,7 @@ export default function VouchersPage() {
     };
 
     getUser();
-  }, [supabase.auth]);
+  }, []);
 
   useEffect(() => {
     const fetchVouchers = async () => {

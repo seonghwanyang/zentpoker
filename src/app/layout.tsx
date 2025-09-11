@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/auth/supabase-auth';
 import { Providers } from '@/providers';
 import { Toaster } from '@/components/ui/toaster';
+import { CookieCleanup } from '@/components/cookie-cleanup';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
+        <CookieCleanup />
         <Providers>
           <AuthProvider>
             {children}

@@ -115,7 +115,16 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return null;
+    return (
+      <LayoutWrapper>
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-purple-600 mx-auto mb-4" />
+            <p className="text-gray-500">로그인 확인 중...</p>
+          </div>
+        </div>
+      </LayoutWrapper>
+    );
   }
 
   const formatCurrency = (amount: number) => {

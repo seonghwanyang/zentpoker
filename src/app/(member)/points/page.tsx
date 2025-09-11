@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect as useSupabaseEffect, useState as useSupabaseState } from 'react';
+import { createClient } from '@/lib/supabase-client';
 import { redirect } from 'next/navigation';
 
 /**
@@ -51,11 +50,9 @@ type Transaction = {
 type TransactionType = 'ALL' | 'REWARD';
 type TransactionStatus = 'ALL' | 'COMPLETED' | 'PENDING' | 'FAILED';
 
-const supabase = createClientComponentClient();
-
 export default function PointsPage() {
-  const [user, setUser] = useSupabaseState<any>(null);
-  const [loading, setLoading] = useSupabaseState(true);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<TransactionType>('ALL');
   const [filterStatus, setFilterStatus] = useState<TransactionStatus>('ALL');
@@ -64,9 +61,10 @@ export default function PointsPage() {
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  useSupabaseEffect(() => {
+  useEffect(() => {
     const getUser = async () => {
       try {
+        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
       } catch (error) {
@@ -77,7 +75,7 @@ export default function PointsPage() {
     };
 
     getUser();
-  }, [supabase.auth]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
