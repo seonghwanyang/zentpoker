@@ -71,12 +71,12 @@ export default function DashboardPage() {
     }
   });
 
-  // 미들웨어에서 인증 처리하므로 여기서는 리다이렉트 제거
-  // useEffect(() => {
-  //   if (!loading && !user) {
-  //     router.push('/login');
-  //   }
-  // }, [user, loading, router]);
+  // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
