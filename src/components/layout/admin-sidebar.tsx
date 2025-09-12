@@ -68,7 +68,13 @@ export function AdminSidebar() {
   const { signOut } = useAuth();
   
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      console.log('Signing out...');
+      await signOut();
+      console.log('Sign out successful');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   // 대기 중인 입금 건수 (실제로는 API에서 가져와야 함)

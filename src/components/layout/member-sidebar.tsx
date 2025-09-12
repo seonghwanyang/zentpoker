@@ -53,7 +53,13 @@ export function MemberSidebar() {
   const { signOut } = useAuth();
   
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      console.log('Signing out...');
+      await signOut();
+      console.log('Sign out successful');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   return (
