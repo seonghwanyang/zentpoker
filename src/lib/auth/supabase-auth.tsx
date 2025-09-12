@@ -85,40 +85,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               });
             }
           } else {
-            // 신규 사용자 생성 - Supabase Auth ID 사용
+            // 신규 사용자 생성 - API route를 통해 서버사이드에서 처리
             console.log('Creating new user for:', session.user.email);
-            const newRole = session.user.email === adminEmail ? 'ADMIN' : 'USER';
             
-            // 새 사용자는 Supabase Auth ID를 사용
-            const { error: insertError } = await supabase.from('User').insert({
-              id: session.user.id, // Supabase Auth UUID
-              email: session.user.email,
-              name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'User',
-              role: newRole,
-              grade: newRole === 'ADMIN' ? 'ADMIN' : 'GUEST',
-              status: 'ACTIVE',
-              points: 0,
-              image: session.user.user_metadata.avatar_url || null
-            });
-            
-            if (insertError) {
-              console.error('Failed to create user:', insertError);
-              // Unique constraint 에러인 경우 (이미 존재하는 ID)
-              if (insertError.code === '23505') {
-                console.log('User already exists with this ID, trying to fetch again...');
-                const { data: retryData } = await supabase
-                  .from('User')
-                  .select('role')
-                  .eq('email', session.user.email)
-                  .single();
-                
-                if (retryData) {
-                  setRole(retryData.role);
-                }
+            try {
+              const response = await fetch('/api/auth/create-user', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  userId: session.user.id,
+                  email: session.user.email,
+                  name: session.user.user_metadata.full_name,
+                  image: session.user.user_metadata.avatar_url
+                }),
+              });
+
+              const result = await response.json();
+              
+              if (response.ok && result.user) {
+                console.log('User created/found successfully:', result);
+                setRole(result.user.role);
+              } else {
+                console.error('Failed to create user:', result.error);
+                // 사용자 생성 실패해도 세션은 유지
+                setRole('USER'); // 기본 역할 설정
               }
-            } else {
-              console.log('New user created successfully with role:', newRole);
-              setRole(newRole);
+            } catch (error) {
+              console.error('Error calling create-user API:', error);
+              setRole('USER'); // 기본 역할 설정
             }
           }
         }
