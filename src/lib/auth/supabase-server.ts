@@ -86,8 +86,8 @@ export async function requireAdmin() {
   
   if (dbError || !userData) {
     // DB에 유저가 없으면 이메일로 확인
-    const adminEmail = process.env.ADMIN_EMAIL || 'yangseonghwan119@gmail.com';
-    if (user.email === adminEmail) {
+    const adminEmails = ['yangseonghwan119@gmail.com', 'longlight93@gmail.com'];
+    if (adminEmails.includes(user.email || '')) {
       // 관리자 데이터 생성
       await supabase.from('User').insert({
         id: user.id,

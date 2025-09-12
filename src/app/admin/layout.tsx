@@ -36,8 +36,8 @@ export default function AdminLayout({
       }
 
       // 관리자 체크
-      const adminEmail = 'yangseonghwan119@gmail.com'
-      const isAdminUser = role === 'ADMIN' || user.email === adminEmail
+      const adminEmails = ['yangseonghwan119@gmail.com', 'longlight93@gmail.com']
+      const isAdminUser = role === 'ADMIN' || adminEmails.includes(user.email || '')
       
       if (isAdminUser) {
         console.log('Admin authorized:', user.email, 'role:', role)

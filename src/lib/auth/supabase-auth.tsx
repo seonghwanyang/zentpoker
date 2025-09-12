@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription?.unsubscribe();
     };
-  }, [router, adminEmail, supabase, isInitialized, mounted]);
+  }, [router, supabase, isInitialized, mounted]);
 
   const signInWithGoogle = async () => {
     if (typeof window === 'undefined' || !supabase) {
