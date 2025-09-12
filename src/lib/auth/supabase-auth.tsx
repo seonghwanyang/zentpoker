@@ -27,8 +27,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   // 관리자 이메일 확인 (role 우선, 이메일은 백업)
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'yangseonghwan119@gmail.com';
-  const isAdmin = role === 'ADMIN' || user?.email === adminEmail;
+  const adminEmails = ['yangseonghwan119@gmail.com', 'longlight93@gmail.com'];
+  const isAdmin = role === 'ADMIN' || adminEmails.includes(user?.email || '');
 
   // Supabase 클라이언트를 한 번만 생성
   const supabase = typeof window !== 'undefined' ? createClient() : null;

@@ -25,8 +25,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'yangseonghwan119@gmail.com';
-    const newRole = email === adminEmail ? 'ADMIN' : 'USER';
+    const adminEmails = ['yangseonghwan119@gmail.com', 'longlight93@gmail.com'];
+    const newRole = adminEmails.includes(email) ? 'ADMIN' : 'USER';
 
     // First check if user already exists
     const { data: existingUser } = await supabaseAdmin
