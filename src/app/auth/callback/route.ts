@@ -28,6 +28,19 @@ export async function GET(request: Request) {
       }
 
       console.log('Session created successfully:', data.session?.user?.email)
+      
+      // 세션이 확실히 설정되었는지 확인
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        console.error('Session not found after exchange')
+        return NextResponse.redirect(
+          `${requestUrl.origin}/login?error=${encodeURIComponent('Session creation failed')}`
+        )
+      }
+      
+      // 성공적으로 세션을 생성했으면 대시보드로 리다이렉트
+      const response = NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+      return response
     } catch (err) {
       console.error('Unexpected error during session exchange:', err)
       return NextResponse.redirect(
@@ -36,6 +49,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // 성공적으로 세션을 생성했으면 대시보드로 리다이렉트
-  return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+  // code가 없으면 홈으로
+  return NextResponse.redirect(`${requestUrl.origin}/`)
 }
